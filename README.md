@@ -35,10 +35,10 @@ but it turns on and off the chime power supply as needed.
 
 ## Relay assignments
 
-* 0-20: 21 notes
-* 21: low AC voltage common (overrides rotary)
-* 22: high AC voltage common (overrides rotary)
-* 23: 110AC for chime power supply
+* 0: 110AC for chime power supply
+* 1: low AC voltage common (overrides rotary)
+* 2: high AC voltage common (overrides rotary)
+* 3-23: 21 notes
 
 ## Setup notes
 
