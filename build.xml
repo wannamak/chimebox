@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="chimebox" default="jar" basedir=".">
+
+  <property name="classes-destination" location="bin" />
+  <property name="jars-destination"    location="." />
+
+  <path id="jars">
+    <fileset dir="lib" includes="*.jar" />
+  </path>
+
+  <!--== Targets =====================================================-->
+
+  <target name="build" >
+    <mkdir dir="${classes-destination}" />
+
+    <javac includeantruntime="false" srcdir="src/java/main" destdir="${classes-destination}"
+           debug="on" includes="**/*.java">
+      <classpath>
+        <path refid="jars" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="build">
+    <jar destfile="${jars-destination}/chimebox.jar"
+    	  basedir="${classes-destination}">
+      <include name="**/*.class" />
+    </jar>
+  </target>
+	
+  <target name="clean">
+  	<delete dir="build" />
+  </target>
+
+</project>
+
