@@ -46,6 +46,7 @@ public class Chimebox {
     this.clochesStop = new ClochesStop(power, volume);
     this.notes = new Notes(relays);
     this.hourlyChimeSwitch = new HourlyChimeSwitch();
+    hourlyChimeSwitch.initialize();
   }
 
   public void run() throws Exception {
