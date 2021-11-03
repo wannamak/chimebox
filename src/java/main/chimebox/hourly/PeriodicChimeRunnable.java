@@ -47,7 +47,7 @@ public class PeriodicChimeRunnable implements Runnable {
     try {
       runInternal();
     } catch (IOException e) {
-      logger.log(Level.WARNING, "", e);
+      logger.log(Level.WARNING, e.getMessage(), e);
     }
   }
 
@@ -88,10 +88,12 @@ public class PeriodicChimeRunnable implements Runnable {
       return;
     }
 
+    logger.info("Power on");
     power.on();
 
-    //volume.setPiano();
-    volume.setDefault();
+    logger.info("Volume piano");
+    volume.setPiano();
+    //volume.setDefault();
 
     MidiPlayer player = new MidiPlayer(currentFile, playerImpl);
     player.play(track);
@@ -109,8 +111,7 @@ public class PeriodicChimeRunnable implements Runnable {
       }
     }
 
-    volume.setDefault();
-
+    logger.info("Power off");
     power.off();
   }
 

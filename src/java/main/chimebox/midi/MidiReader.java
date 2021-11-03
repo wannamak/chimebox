@@ -7,8 +7,11 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.ShortMessage;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class MidiReader {
+  private final Logger logger = Logger.getLogger(MidiReader.class.getName());
+
   private static final int DEFAULT_USEC_PER_QUARTER = 500000;
 
   public MidiFile read(File file) throws IOException, InvalidMidiDataException {
