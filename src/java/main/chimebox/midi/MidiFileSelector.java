@@ -30,6 +30,7 @@ public class MidiFileSelector {
       File chimeFile = chimeFiles.get(index);
       if (!chimeFile.exists()) {
         logger.warning("File not found: " + chimeFile.getAbsolutePath());
+        chimeFiles.remove(index);
         continue;
       }
       try {
