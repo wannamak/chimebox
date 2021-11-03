@@ -43,23 +43,25 @@ public class GPIOController {
   public synchronized void initialize() throws IOException {
     if (!Files.exists(DIRECTION_FILE)) {
       logger.fine("Writing pin to " + EXPORT_DIR);
-      Files.writeString(EXPORT_DIR, Integer.toString(logicalPin));
-      try {
-        // AccessDeniedException?
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      if (!repeatedlyAttemptWrite(EXPORT_DIR, Integer.toString(logicalPin))) {
+        logger.severe("Unable to export pin");
       }
     }
     logger.fine("Writing direction to " + DIRECTION_FILE);
     // https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
     // says we can write high for out
     String directionFileContent = direction == Direction.OUT ? "high" : "in";
+    if (!repeatedlyAttemptWrite(DIRECTION_FILE, directionFileContent)) {
+      logger.severe("Unable to write direction file for logical pin " + logicalPin);
+    }
+  }
+
+  private boolean repeatedlyAttemptWrite(Path path, String content) throws IOException {
     int retryCount = 0;
     while (retryCount < 20) {
       try {
-        Files.writeString(DIRECTION_FILE, directionFileContent);
-        return;
+        Files.writeString(path, content);
+        return true;
       } catch (AccessDeniedException ade) {
         retryCount++;
         try {
@@ -69,7 +71,7 @@ public class GPIOController {
         }
       }
     }
-    logger.severe("Unable to write direction file for logical pin " + logicalPin);
+    return false;
   }
 
   public synchronized void set(Value value) throws IOException {
