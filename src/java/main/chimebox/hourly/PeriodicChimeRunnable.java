@@ -19,7 +19,7 @@ public class PeriodicChimeRunnable implements Runnable {
   private final Logger logger = Logger.getLogger(PeriodicChimeRunnable.class.getName());
   private MidiFile currentFile;
 
-  private static final int SILENCE_PRIOR_TO_HOUR_CHIMES_MS = 1500;
+  private static final int SILENCE_PRIOR_TO_HOUR_CHIMES_MS = 1000;
   private static final int SILENCE_BETWEEN_HOUR_CHIMES_MS = 1200;
 
   // TODO: move to config
@@ -106,8 +106,13 @@ public class PeriodicChimeRunnable implements Runnable {
         numRepeats -= 12;
       }
 
-      //volume.setForte();
+      volume.setForte();
       for (int i = 0; i < numRepeats; i++) {
+        if (!hourlyChimeSwitch.isClosed()) {
+          logger.info("Not hourly chiming due to hourly chime switch off");
+          power.off();
+          return;
+        }
         if (i > 0) {
           uncheckedThreadSleepMs(SILENCE_BETWEEN_HOUR_CHIMES_MS);
         }
