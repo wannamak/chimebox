@@ -19,14 +19,16 @@ public class PeriodicChimeRunnable implements Runnable {
   private final Logger logger = Logger.getLogger(PeriodicChimeRunnable.class.getName());
   private MidiFile currentFile;
 
+  private static final int SILENCE_PRIOR_TO_HOUR_CHIMES_MS = 1500;
+  private static final int SILENCE_BETWEEN_HOUR_CHIMES_MS = 1200;
+
   // TODO: move to config
-  private static final LocalTime START_TIME = LocalTime.of(8, 0);
+  private static final LocalTime START_TIME = LocalTime.of(8, 1);
   private static final LocalTime END_TIME = LocalTime.of(20, 0);
 
   private final HourlyChimeSwitch hourlyChimeSwitch;
   private final Volume volume;
   private final Power power;
-  private final Notes notes;
   private final MidiFileSelector midiFileSelector = new MidiFileSelector();
   private final ClochesStop clochesStop;
   private final MidiNotePlayer playerImpl;
@@ -36,7 +38,6 @@ public class PeriodicChimeRunnable implements Runnable {
     this.hourlyChimeSwitch = hourlyChimeSwitch;
     this.power = power;
     this.volume = volume;
-    this.notes = notes;
     this.clochesStop = clochesStop;
     this.playerImpl = new MidiNotePlayer(notes);
   }
@@ -93,26 +94,37 @@ public class PeriodicChimeRunnable implements Runnable {
 
     logger.info("Volume piano");
     volume.setPiano();
-    //volume.setDefault();
 
     MidiPlayer player = new MidiPlayer(currentFile, playerImpl);
     player.play(track);
 
     if (track == MidiFile.HOUR_TRACK) {
+      uncheckedThreadSleepMs(SILENCE_PRIOR_TO_HOUR_CHIMES_MS);
+
       int numRepeats = time.getHour();
       if (numRepeats > 12) {
         numRepeats -= 12;
       }
-      logger.info("number of chimes is " + numRepeats);
 
-      volume.setForte();
+      //volume.setForte();
       for (int i = 0; i < numRepeats; i++) {
-        player.play(MidiFile.CHIME_TRACK);
+        if (i > 0) {
+          uncheckedThreadSleepMs(SILENCE_BETWEEN_HOUR_CHIMES_MS);
+        }
+        player.play(MidiFile.CHIME_TRACK, true);
       }
     }
 
     logger.info("Power off");
     power.off();
+  }
+
+  private void uncheckedThreadSleepMs(int ms) {
+    try {
+      Thread.sleep(ms);
+    } catch (InterruptedException ie) {
+      logger.log(Level.WARNING, ie.getMessage(), ie);
+    }
   }
 
   private int getTrackFromMinuteOfHour(int minuteOfHour) {
