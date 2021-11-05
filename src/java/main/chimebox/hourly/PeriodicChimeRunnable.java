@@ -132,7 +132,7 @@ public class PeriodicChimeRunnable implements Runnable {
         if (i > 0) {
           uncheckedThreadSleepMs(SILENCE_BETWEEN_HOUR_CHIMES_MS);
         }
-        chimePlayer.play(MidiFile.CHIME_TRACK, true);
+        chimePlayer.play(MidiFile.CHIME_TRACK);
       }
     }
 
