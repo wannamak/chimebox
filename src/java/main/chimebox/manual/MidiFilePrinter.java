@@ -5,9 +5,12 @@ import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiPlayer;
 import chimebox.midi.PlayerInterface;
+import chimebox.midi.RepeatedNoteAdaptor;
 
 // ./scripts/run.sh chimebox.manual.MidiFilePrinter 0
 public class MidiFilePrinter implements PlayerInterface {
+  private int trackLengthMs = 0;
+
   public static void main(String[] args) throws Exception {
     new MidiFilePrinter().run(Integer.parseInt(args[0]));
   }
@@ -18,12 +21,19 @@ public class MidiFilePrinter implements PlayerInterface {
     MidiFile file = selector.select(fileIndex);
     System.out.println("Tracks: " + file.getTrackSize());
 
-    MidiPlayer engine = new MidiPlayer(file, this);
+    printTracks(file, this);
+    System.out.println();
+    System.out.println();
+    printTracks(file, new RepeatedNoteAdaptor(this));
+  }
 
-    for (int track = 0; track < file.getTrackSize(); track++) {
+  private void printTracks(MidiFile file, PlayerInterface playerImpl) {
+    MidiPlayer engine = new MidiPlayer(file, playerImpl);
+    for (int track = 1; track < file.getTrackSize(); track++) {
+      trackLengthMs = 0;
       System.out.println("TRACK " + track + "----------------------");
       engine.play(track);
-      System.out.println();
+      System.out.printf("  total len: %dms\n", trackLengthMs);
     }
   }
 
@@ -31,6 +41,7 @@ public class MidiFilePrinter implements PlayerInterface {
   public void sleep(long durationMillis) {
     if (durationMillis > 0) {
       System.out.printf("[%d] ", durationMillis);
+      trackLengthMs += durationMillis;
     }
   }
 

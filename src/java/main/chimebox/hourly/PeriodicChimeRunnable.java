@@ -11,6 +11,7 @@ import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiNotePlayer;
 import chimebox.midi.MidiPlayer;
+import chimebox.midi.RepeatedNoteAdaptor;
 
 import javax.sound.midi.InvalidMidiDataException;
 import java.io.IOException;
@@ -97,7 +98,7 @@ public class PeriodicChimeRunnable implements Runnable {
       int transposition = midiFileSelector.getRandomInt(possibleTranspositions.size());
       logger.info("Transposition: " + transposition);
 
-      tunePlayer = new MidiPlayer(currentFile, new MidiNotePlayer(notes, transposition));
+      tunePlayer = new MidiPlayer(currentFile, new RepeatedNoteAdaptor(new MidiNotePlayer(notes, transposition)));
       chimePlayer = new MidiPlayer(currentFile, new LowestMidiNotePlayer(notes, transposition));
     }
 
