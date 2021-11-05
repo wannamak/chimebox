@@ -26,7 +26,7 @@ public class PeriodicChimeRunnable implements Runnable {
   private MidiPlayer tunePlayer;
   private MidiPlayer chimePlayer;
 
-  private static final int SILENCE_PRIOR_TO_HOUR_CHIMES_MS = 1000;
+  private static final int SILENCE_PRIOR_TO_HOUR_CHIMES_MS = 3000;
   private static final int SILENCE_BETWEEN_HOUR_CHIMES_MS = 1200;
 
   // TODO: move to config
