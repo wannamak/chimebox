@@ -12,7 +12,7 @@ public class MidiFileDatabase {
 
   public MidiFileDatabase() {
     chimeFiles.add(new File("./music/westminster.mid"));
-    possibleTranspositions.add(ImmutableList.of(-8, -6, -5, -4, -3, -1, 0));
+    possibleTranspositions.add(ImmutableList.of(/*-8, -6, -5, */ -4, -3, -1, 0));
 
     chimeFiles.add(new File("./music/whittington.mid"));
     possibleTranspositions.add(ImmutableList.of(-3, 0, 2));
@@ -21,7 +21,7 @@ public class MidiFileDatabase {
     possibleTranspositions.add(ImmutableList.of(-1, 0, 2 /*, 4, 6, 7, 8, 9 */));
 
     chimeFiles.add(new File("./music/st-michaels.mid"));
-    possibleTranspositions.add(ImmutableList.of(-6, -3, -1));
+    possibleTranspositions.add(ImmutableList.of(/*-6,*/ -3, -1));
 
     for (File chimeFile : chimeFiles) {
       if (!chimeFile.exists()) {
