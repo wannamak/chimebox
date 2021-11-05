@@ -7,6 +7,7 @@ import chimebox.logical.Notes;
 import chimebox.logical.Power;
 import chimebox.logical.Relays;
 import chimebox.logical.Volume;
+import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiReceiver;
 
 import javax.sound.midi.MidiDevice;
@@ -24,6 +25,7 @@ public class Chimebox {
   private final Volume volume;
   private final Notes notes;
   private final HourlyChimeSwitch hourlyChimeSwitch;
+  private final MidiFileDatabase database;
 
   public static void main(String[] args) throws Exception {
     System.loadLibrary("chimebox");
@@ -47,11 +49,12 @@ public class Chimebox {
     this.notes = new Notes(relays);
     this.hourlyChimeSwitch = new HourlyChimeSwitch();
     hourlyChimeSwitch.initialize();
+    this.database = new MidiFileDatabase();
   }
 
   public void run() throws Exception {
     ChimeSchedulerThread scheduler = new ChimeSchedulerThread(
-        hourlyChimeSwitch, volume, power, notes, clochesStop);
+        database, hourlyChimeSwitch, volume, power, notes, clochesStop);
     scheduler.start();
 
     listMidiDevices();

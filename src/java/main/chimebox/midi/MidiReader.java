@@ -31,7 +31,7 @@ public class MidiReader {
         }
       }
     }
-    return new MidiFile(usecPerQuarter, sequence.getResolution(), sequence.getTracks());
+    return new MidiFile(file, usecPerQuarter, sequence.getResolution(), sequence.getTracks());
   }
 
   private void processEvent(MidiEvent event) {

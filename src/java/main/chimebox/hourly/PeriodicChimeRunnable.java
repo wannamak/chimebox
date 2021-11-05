@@ -5,19 +5,25 @@ import chimebox.logical.HourlyChimeSwitch;
 import chimebox.logical.Notes;
 import chimebox.logical.Power;
 import chimebox.logical.Volume;
+import chimebox.midi.LowestMidiNotePlayer;
 import chimebox.midi.MidiFile;
+import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiNotePlayer;
 import chimebox.midi.MidiPlayer;
 
+import javax.sound.midi.InvalidMidiDataException;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PeriodicChimeRunnable implements Runnable {
   private final Logger logger = Logger.getLogger(PeriodicChimeRunnable.class.getName());
   private MidiFile currentFile;
+  private MidiPlayer tunePlayer;
+  private MidiPlayer chimePlayer;
 
   private static final int SILENCE_PRIOR_TO_HOUR_CHIMES_MS = 1000;
   private static final int SILENCE_BETWEEN_HOUR_CHIMES_MS = 1200;
@@ -26,20 +32,25 @@ public class PeriodicChimeRunnable implements Runnable {
   private static final LocalTime START_TIME = LocalTime.of(8, 1);
   private static final LocalTime END_TIME = LocalTime.of(20, 0);
 
+  private final MidiFileDatabase database;
+  private final MidiFileSelector midiFileSelector;
   private final HourlyChimeSwitch hourlyChimeSwitch;
   private final Volume volume;
   private final Power power;
-  private final MidiFileSelector midiFileSelector = new MidiFileSelector();
   private final ClochesStop clochesStop;
-  private final MidiNotePlayer playerImpl;
+  private final Notes notes;
 
-  public PeriodicChimeRunnable(HourlyChimeSwitch hourlyChimeSwitch, Power power, Volume volume,
+
+  public PeriodicChimeRunnable(MidiFileDatabase database, HourlyChimeSwitch hourlyChimeSwitch,
+      Power power, Volume volume,
       Notes notes, ClochesStop clochesStop) {
+    this.database = database;
+    this.midiFileSelector = new MidiFileSelector(database);
     this.hourlyChimeSwitch = hourlyChimeSwitch;
     this.power = power;
     this.volume = volume;
     this.clochesStop = clochesStop;
-    this.playerImpl = new MidiNotePlayer(notes);
+    this.notes = notes;
   }
 
   @Override
@@ -47,12 +58,12 @@ public class PeriodicChimeRunnable implements Runnable {
     logger.info("PCR triggered at " + LocalTime.now());
     try {
       runInternal();
-    } catch (IOException e) {
+    } catch (IOException | InvalidMidiDataException e) {
       logger.log(Level.WARNING, e.getMessage(), e);
     }
   }
 
-  private void runInternal() throws IOException {
+  private void runInternal() throws IOException, InvalidMidiDataException {
     LocalTime time = LocalTime.now();
 
     if (!hourlyChimeSwitch.isClosed()) {
@@ -81,6 +92,13 @@ public class PeriodicChimeRunnable implements Runnable {
         logger.info("Not chiming due to no chime files available");
         return;
       }
+
+      List<Integer> possibleTranspositions = database.getPossibleTranspositions(currentFile.getFile());
+      int transposition = midiFileSelector.getRandomInt(possibleTranspositions.size());
+      logger.info("Transposition: " + transposition);
+
+      tunePlayer = new MidiPlayer(currentFile, new MidiNotePlayer(notes, transposition));
+      chimePlayer = new MidiPlayer(currentFile, new LowestMidiNotePlayer(notes, transposition));
     }
 
     int track = getTrackFromMinuteOfHour(time.getMinute());
@@ -89,14 +107,12 @@ public class PeriodicChimeRunnable implements Runnable {
       return;
     }
 
-    logger.info("Power on");
+    logger.finer("Power on");
     power.on();
 
-    logger.info("Volume piano");
     volume.setPiano();
 
-    MidiPlayer player = new MidiPlayer(currentFile, playerImpl);
-    player.play(track);
+    tunePlayer.play(track);
 
     if (track == MidiFile.HOUR_TRACK) {
       uncheckedThreadSleepMs(SILENCE_PRIOR_TO_HOUR_CHIMES_MS);
@@ -116,11 +132,11 @@ public class PeriodicChimeRunnable implements Runnable {
         if (i > 0) {
           uncheckedThreadSleepMs(SILENCE_BETWEEN_HOUR_CHIMES_MS);
         }
-        player.play(MidiFile.CHIME_TRACK, true);
+        chimePlayer.play(MidiFile.CHIME_TRACK, true);
       }
     }
 
-    logger.info("Power off");
+    logger.finer("Power off");
     power.off();
   }
 

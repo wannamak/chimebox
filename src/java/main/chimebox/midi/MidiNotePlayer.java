@@ -10,9 +10,11 @@ public class MidiNotePlayer implements PlayerInterface {
 
   private final MidiNoteAdaptor adaptor = new MidiNoteAdaptor();
   private final Notes notes;
+  private final int transposition;
 
-  public MidiNotePlayer(Notes notes) {
+  public MidiNotePlayer(Notes notes, int transposition) {
     this.notes = notes;
+    this.transposition = transposition;
   }
 
   @Override
@@ -26,13 +28,17 @@ public class MidiNotePlayer implements PlayerInterface {
 
   @Override
   public void noteOn(int midiNote) {
-    int chimeNote = adaptor.toChimesNote(midiNote);
+    int chimeNote = getChimeNote(midiNote);
     notes.on(chimeNote);
   }
 
   @Override
   public void noteOff(int midiNote) {
-    int chimeNote = adaptor.toChimesNote(midiNote);
+    int chimeNote = getChimeNote(midiNote);
     notes.off(chimeNote);
+  }
+
+  public int getChimeNote(int midiNote) {
+    return adaptor.toChimesNote(midiNote) + transposition;
   }
 }

@@ -5,6 +5,7 @@ import chimebox.logical.HourlyChimeSwitch;
 import chimebox.logical.Notes;
 import chimebox.logical.Power;
 import chimebox.logical.Volume;
+import chimebox.midi.MidiFileDatabase;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -20,14 +21,16 @@ public class ChimeSchedulerThread extends Thread {
   private final ScheduledExecutorService scheduler =
       Executors.newScheduledThreadPool(1);
 
+  private final MidiFileDatabase database;
   private final HourlyChimeSwitch hourlyChimeSwitch;
   private final Volume volume;
   private final Power power;
   private final Notes notes;
   private final ClochesStop clochesStop;
 
-  public ChimeSchedulerThread(HourlyChimeSwitch hourlyChimeSwitch,
+  public ChimeSchedulerThread(MidiFileDatabase database, HourlyChimeSwitch hourlyChimeSwitch,
       Volume volume, Power power, Notes notes, ClochesStop clochesStop) {
+    this.database = database;
     this.hourlyChimeSwitch = hourlyChimeSwitch;
     this.volume = volume;
     this.power = power;
@@ -37,8 +40,8 @@ public class ChimeSchedulerThread extends Thread {
 
   @Override
   public void run() {
-    PeriodicChimeRunnable runnable = new PeriodicChimeRunnable(hourlyChimeSwitch,
-        power, volume, notes, clochesStop);
+    PeriodicChimeRunnable runnable = new PeriodicChimeRunnable(database,
+        hourlyChimeSwitch, power, volume, notes, clochesStop);
     LocalDateTime today = LocalDateTime.now();
     long initialDelayMillis = getMillisUntilNextChime(today);
     ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
