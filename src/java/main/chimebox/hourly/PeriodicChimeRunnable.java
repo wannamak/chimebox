@@ -31,7 +31,7 @@ public class PeriodicChimeRunnable implements Runnable {
 
   // TODO: move to config
   private static final LocalTime START_TIME = LocalTime.of(8, 1);
-  private static final LocalTime END_TIME = LocalTime.of(20, 0);
+  private static final LocalTime END_TIME = LocalTime.of(20, 1);
 
   private final MidiFileDatabase database;
   private final MidiFileSelector midiFileSelector;
@@ -94,8 +94,13 @@ public class PeriodicChimeRunnable implements Runnable {
         return;
       }
 
+      logger.info("Tune: " + currentFile);
       List<Integer> possibleTranspositions = database.getPossibleTranspositions(currentFile.getFile());
-      int transposition = midiFileSelector.getRandomInt(possibleTranspositions.size());
+      int transposition = 0; //midiFileSelector.getRandomInt(possibleTranspositions.size());
+      if (currentFile.getFile().getName().contains("michaels")) {
+        // kludge to avoid bad striker
+        transposition = -1;
+      }
       logger.info("Transposition: " + transposition);
 
       tunePlayer = new MidiPlayer(currentFile, new RepeatedNoteAdaptor(new MidiNotePlayer(notes, transposition)));
