@@ -96,11 +96,7 @@ public class PeriodicChimeRunnable implements Runnable {
 
       logger.info("Tune: " + currentFile);
       List<Integer> possibleTranspositions = database.getPossibleTranspositions(currentFile.getFile());
-      int transposition = 0; //midiFileSelector.getRandomInt(possibleTranspositions.size());
-      if (currentFile.getFile().getName().contains("michaels")) {
-        // kludge to avoid bad striker
-        transposition = -1;
-      }
+      int transposition = midiFileSelector.getRandomInt(possibleTranspositions.size());
       logger.info("Transposition: " + transposition);
 
       tunePlayer = new MidiPlayer(currentFile, new RepeatedNoteAdaptor(new MidiNotePlayer(notes, transposition)));
@@ -116,11 +112,12 @@ public class PeriodicChimeRunnable implements Runnable {
     logger.finer("Power on");
     power.on();
 
-    volume.setPiano();
+    volume.setForte();
+    //volume.setPiano();
 
     tunePlayer.play(track);
 
-    if (track == MidiFile.HOUR_TRACK) {
+    if (false && track == MidiFile.HOUR_TRACK) {
       uncheckedThreadSleepMs(SILENCE_PRIOR_TO_HOUR_CHIMES_MS);
 
       int numRepeats = time.getHour();
@@ -128,7 +125,7 @@ public class PeriodicChimeRunnable implements Runnable {
         numRepeats -= 12;
       }
 
-      volume.setForte();
+      //volume.setForte();
       for (int i = 0; i < numRepeats; i++) {
         if (!hourlyChimeSwitch.isClosed()) {
           logger.info("Not hourly chiming due to hourly chime switch off");
