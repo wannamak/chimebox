@@ -30,6 +30,10 @@ public class ManualMidiPlayer {
   private final MidiFileSelector fileSelector;
 
   public static void main(String args[]) throws Exception {
+    if (args.length != 3) {
+      System.err.println("args file_index track_index transposition");
+      System.exit(-1);
+    }
     System.loadLibrary("chimebox");
     new ManualMidiPlayer().run(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
   }
@@ -55,7 +59,7 @@ public class ManualMidiPlayer {
     logger.info(String.format(
         "Playing file index %d track %d transposition %d\n", fileIndex, trackIndex, transposition));
     power.on();
-    volume.setPiano();
+    volume.setForte();
     tunePlayer.play(trackIndex);
     power.off();
     logger.info("Play complete.");
