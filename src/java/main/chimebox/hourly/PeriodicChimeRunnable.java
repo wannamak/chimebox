@@ -97,6 +97,8 @@ public class PeriodicChimeRunnable implements Runnable {
       logger.info("Tune: " + currentFile);
       List<Integer> possibleTranspositions = database.getPossibleTranspositions(currentFile.getFile());
       int transposition = midiFileSelector.getRandomInt(possibleTranspositions.size());
+      transposition = possibleTranspositions.get(0);
+
       logger.info("Transposition: " + transposition);
 
       tunePlayer = new MidiPlayer(currentFile, new RepeatedNoteAdaptor(new MidiNotePlayer(notes, transposition)));

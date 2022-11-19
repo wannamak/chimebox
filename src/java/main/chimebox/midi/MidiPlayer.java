@@ -18,7 +18,8 @@ public class MidiPlayer {
 
   public void play(int trackIndex) {
     lastDeltaTime = 0;
-    logger.info(String.format("Playing track %d.  usecPerQuarter=%d pulsePerQuarter=%d",
+    logger.info(String.format("Playing file %s track %d.  usecPerQuarter=%d pulsePerQuarter=%d",
+        file.getFile().getName(),
         trackIndex, file.getUsecPerQuarter(), file.getPulsePerQuarter()));
     int numEvents = file.getTrack(trackIndex).size();
     for (int eventIndex = 0; eventIndex < numEvents; eventIndex++) {
