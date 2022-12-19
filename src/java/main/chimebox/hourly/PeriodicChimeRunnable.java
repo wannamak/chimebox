@@ -87,7 +87,9 @@ public class PeriodicChimeRunnable implements Runnable {
       return;
     }
 
-    if (currentFile == null || time.getMinute() == 15) {
+    int MINUTE_OF_HOUR_TO_BEGIN_CHIME = 30; // 15
+
+    if (currentFile == null || time.getMinute() == MINUTE_OF_HOUR_TO_BEGIN_CHIME) {
       currentFile = midiFileSelector.select();
       if (currentFile == null) {
         logger.info("Not chiming due to no chime files available");
@@ -157,12 +159,12 @@ public class PeriodicChimeRunnable implements Runnable {
     switch (minuteOfHour) {
       case 0:
         return MidiFile.HOUR_TRACK;
-      case 15:
-        return MidiFile.QUARTER_TRACK;
+//      case 15:
+//        return MidiFile.QUARTER_TRACK;
       case 30:
         return MidiFile.HALF_TRACK;
-      case 45:
-        return MidiFile.THREE_QUARTERS_TRACK;
+//      case 45:
+//        return MidiFile.THREE_QUARTERS_TRACK;
       default:
         logger.warning("Unrecognized minute of hour " + minuteOfHour);
         return -1;

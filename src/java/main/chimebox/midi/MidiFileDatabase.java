@@ -15,7 +15,7 @@ public class MidiFileDatabase {
     possibleTranspositions.add(ImmutableList.of(0, /*-8, -6, -5, */ -4, -3, -1));
 
     chimeFiles.add(new File("./music/whittington.mid"));
-    possibleTranspositions.add(ImmutableList.of(0, -3, 2));
+    possibleTranspositions.add(ImmutableList.of(-3, 0, 2));
 
     chimeFiles.add(new File("./music/soissons.mid"));
     possibleTranspositions.add(ImmutableList.of(0, -1, 2 /*, 4, 6, 7, 8, 9 */));
