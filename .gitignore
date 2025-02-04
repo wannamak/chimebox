@@ -2,3 +2,6 @@ bin
 .idea/
 chimebox.jar
 NOTES
+config.txt
+hymnary.db
+hymns/
