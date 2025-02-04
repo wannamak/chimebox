@@ -10,6 +10,13 @@ public class MidiFileDatabase {
   private List<File> chimeFiles = new ArrayList<>();
   private List<List<Integer>> possibleTranspositions = new ArrayList<>();
 
+  public static final int WESTMINSTER = 0;
+  public static final int WHITTINGTON = 1;
+  public static final int SOISSONS = 2;
+  public static final int ST_MICHAELS = 3;
+  public static final int HAPPY_BIRTHDAY = 4;
+  public static final int BEECH_SPRING = 5;
+
   public MidiFileDatabase() {
     chimeFiles.add(new File("./music/westminster.mid"));
     possibleTranspositions.add(ImmutableList.of(0, /*-8, -6, -5, */ -4, -3, -1));
@@ -22,6 +29,12 @@ public class MidiFileDatabase {
 
     chimeFiles.add(new File("./music/st-michaels.mid"));
     possibleTranspositions.add(ImmutableList.of(-6 /* -3, -1 */));
+
+    chimeFiles.add(new File("./music/birthday.mid"));
+    possibleTranspositions.add(ImmutableList.of(-1, 2));
+
+    chimeFiles.add(new File("./music/beech.mid"));
+    possibleTranspositions.add(ImmutableList.of(-1, 2));
 
     for (File chimeFile : chimeFiles) {
       if (!chimeFile.exists()) {

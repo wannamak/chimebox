@@ -1,6 +1,7 @@
 package chimebox.manual;
 
 import chimebox.logical.HourlyChimeSwitch;
+import chimebox.logical.RaspberryRelays;
 import chimebox.logical.Relay;
 import chimebox.logical.Relays;
 
@@ -14,7 +15,7 @@ public class ManualTester {
 
   public void run() throws IOException {
     System.loadLibrary("chimebox");
-    Relays relays = new Relays();
+    Relays relays = new RaspberryRelays();
     HourlyChimeSwitch hourlyChimeSwitch = new HourlyChimeSwitch();
     relays.initialize();
     hourlyChimeSwitch.initialize();

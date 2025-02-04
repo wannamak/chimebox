@@ -22,6 +22,7 @@ public class MidiPlayer {
         file.getFile().getName(),
         trackIndex, file.getUsecPerQuarter(), file.getPulsePerQuarter()));
     int numEvents = file.getTrack(trackIndex).size();
+    logger.info(String.format("%d events found", numEvents));
     for (int eventIndex = 0; eventIndex < numEvents; eventIndex++) {
       boolean isLastEvent = eventIndex == numEvents - 1;
       processEvent(file.getTrack(trackIndex).get(eventIndex), isLastEvent);
@@ -37,13 +38,20 @@ public class MidiPlayer {
     int msPerQuarter = file.getUsecPerQuarter() / 1000;
     long msForPeriod = period * msPerQuarter / file.getPulsePerQuarter();
 
+    logger.info(String.format("period=%d msPerQtr=%d msForPeriod=%d",
+        period, msPerQuarter, msForPeriod));
+
     if (!isLastEvent) {
-      logger.finest(String.format(" msperq=%d, so sleeping %d ms", msPerQuarter, msForPeriod));
+      logger.info(String.format(" msperq=%d, so sleeping %d ms", msPerQuarter, msForPeriod));
       playerInterface.sleep(msForPeriod);
     }
 
-    if (event.getMessage() instanceof ShortMessage) {
-      ShortMessage shortMessage = (ShortMessage) event.getMessage();
+    if (event.getMessage() instanceof ShortMessage shortMessage) {
+      if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+        logger.info("ON  note " + shortMessage.getData1());
+      } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
+        logger.info("OFF note " + shortMessage.getData1());
+      }
       switch (shortMessage.getCommand()) {
         case ShortMessage.NOTE_ON -> playerInterface.noteOn(shortMessage.getData1());
         case ShortMessage.NOTE_OFF -> playerInterface.noteOff(shortMessage.getData1());

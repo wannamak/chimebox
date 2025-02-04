@@ -1,5 +1,6 @@
 package chimebox.manual;
 
+import chimebox.Proto;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
@@ -17,7 +18,7 @@ public class MidiFilePrinter implements PlayerInterface {
 
   public void run(int fileIndex) throws Exception {
     MidiFileDatabase database = new MidiFileDatabase();
-    MidiFileSelector selector = new MidiFileSelector(database);
+    MidiFileSelector selector = new MidiFileSelector(database, Proto.Config.getDefaultInstance());
     MidiFile file = selector.select(fileIndex);
     System.out.println("Tracks: " + file.getTrackSize());
 

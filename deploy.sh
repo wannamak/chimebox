@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 ant
-scp chimebox.jar 192.168.1.220:/home/ubuntu/lib/chimebox.jar
-ssh 192.168.1.220 "sudo systemctl restart chimebox"
+scp chimebox.jar chimebox:/home/ubuntu/lib/chimebox.jar
+ssh chimebox "sudo systemctl restart chimebox"

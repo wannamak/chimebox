@@ -5,15 +5,20 @@ import chimebox.logical.ClochesStop;
 import chimebox.logical.HourlyChimeSwitch;
 import chimebox.logical.Notes;
 import chimebox.logical.Power;
+import chimebox.logical.RaspberryRelays;
 import chimebox.logical.Relays;
 import chimebox.logical.Volume;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiReceiver;
+import chimebox.Proto;
+import com.google.protobuf.TextFormat;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Transmitter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -26,10 +31,16 @@ public class Chimebox {
   private final Notes notes;
   private final HourlyChimeSwitch hourlyChimeSwitch;
   private final MidiFileDatabase database;
+  private final Proto.Config config;
+
 
   public static void main(String[] args) throws Exception {
+    if (args.length == 0) {
+      System.err.println("Specify path to config.txt");
+      System.exit(-1);
+    }
     System.loadLibrary("chimebox");
-    new Chimebox("Uno").run();
+    new Chimebox(args[0]).run();
   }
 
   public void listMidiDevices() {
@@ -39,9 +50,15 @@ public class Chimebox {
     }
   }
 
-  public Chimebox(String arg) throws IOException {
-    this.inputDeviceNameSubstring = arg;
-    Relays relays = new Relays();
+  public Chimebox(String pathToConfig) throws IOException {
+    Proto.Config.Builder configBuilder = Proto.Config.newBuilder();
+    logger.info("Reading config from " + pathToConfig);
+    try (BufferedReader br = new BufferedReader(new FileReader(pathToConfig))) {
+      TextFormat.merge(br, configBuilder);
+    }
+    this.config = configBuilder.build();
+    this.inputDeviceNameSubstring = config.getUniqueMidiDeviceSubstring();
+    Relays relays = new RaspberryRelays();
     relays.initialize();
     this.power = new Power(relays);
     this.volume = new Volume(relays);
@@ -54,7 +71,7 @@ public class Chimebox {
 
   public void run() throws Exception {
     ChimeSchedulerThread scheduler = new ChimeSchedulerThread(
-        database, hourlyChimeSwitch, volume, power, notes, clochesStop);
+        database, hourlyChimeSwitch, volume, power, notes, clochesStop, config);
     scheduler.start();
 
     listMidiDevices();

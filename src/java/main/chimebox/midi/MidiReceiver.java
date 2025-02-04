@@ -6,6 +6,7 @@ import chimebox.logical.Notes;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
+import java.util.HexFormat;
 import java.util.logging.Logger;
 
 public class MidiReceiver implements Receiver {
@@ -15,9 +16,13 @@ public class MidiReceiver implements Receiver {
   private static final int MIN_CLOCHES_MIDI_NOTE = 57;  // A below middle C
   private static final int MAX_CLOCHES_MIDI_NOTE = 77;
 
+  // TODO: move to config
+  private static final boolean PRINT_MESSAGES = false;
+
   private final ClochesStop cloches;
   private final Notes notes;
   private final MidiNoteAdaptor adaptor = new MidiNoteAdaptor();
+  private final MidiMessageLogger messageLogger = new MidiMessageLogger();
 
   public MidiReceiver(ClochesStop cloches, Notes notes) {
     this.cloches = cloches;
@@ -29,14 +34,17 @@ public class MidiReceiver implements Receiver {
   /** This is actually called when a message is received.  Poor API naming. */
   @Override
   public void send(MidiMessage rawMessage, long l) {
-    logger.finest("Received midi message at " + l);
+    logger.finest("Received midi message: " + HexFormat.of().formatHex(rawMessage.getMessage()));
     if (!(rawMessage instanceof ShortMessage)) {
-      logger.finest("Ignoring meta or sysex message");
+      logger.info("Ignoring meta or sysex message");
       return;
     }
     ShortMessage message = (ShortMessage) rawMessage;
+    if (PRINT_MESSAGES) {
+      messageLogger.log(message);
+    }
     if (message.getChannel() != CLOCHES_CHANNEL) {
-      logger.info("Ignoring message on channel " + message.getChannel());
+      logger.finest("Ignoring message on channel " + message.getChannel());
       return;
     }
     if (message.getCommand() == ShortMessage.NOTE_ON) {

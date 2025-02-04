@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="chimebox" default="jar" basedir=".">
-
   <property name="classes-destination" location="bin" />
   <property name="jars-destination"    location="." />
 
@@ -10,7 +9,16 @@
 
   <!--== Targets =====================================================-->
 
-  <target name="build" >
+  <available file="/usr/bin/protoc" type="file" property="protoc" value="/usr/bin/protoc" />
+
+  <target name="proto">
+      <exec executable="${protoc}">
+          <arg value="--java_out=src/java/main"/>
+          <arg value="src/proto/chimebox.proto"/>
+      </exec>
+  </target>
+
+  <target name="build" depends="proto" >
     <mkdir dir="${classes-destination}" />
 
     <javac includeantruntime="false" srcdir="src/java/main" destdir="${classes-destination}"
@@ -29,7 +37,40 @@
   </target>
 	
   <target name="clean">
-  	<delete dir="build" />
+      <delete dir="bin" />
+  </target>
+
+  <target name="chimebox" depends="build">
+      <java classname="chimebox.Chimebox" fork="true">
+      <classpath>
+        <path refid="jars"/>
+        <path location="${classes-destination}"/>
+      </classpath>
+      <sysproperty key="java.util.logging.config.file" value="logging.properties"/>
+      <arg value="config.txt" />
+    </java>
+  </target>
+
+  <target name="hymnary" depends="build">
+      <java classname="chimebox.web.Hymnary" fork="true">
+      <classpath>
+        <path refid="jars"/>
+        <path location="${classes-destination}"/>
+      </classpath>
+      <sysproperty key="java.util.logging.config.file" value="logging.properties"/>
+      <arg value="hymns" />
+    </java>
+  </target>
+
+  <target name="extract" depends="build">
+      <java classname="chimebox.web.ExtractMelody" fork="true">
+      <classpath>
+        <path refid="jars"/>
+        <path location="${classes-destination}"/>
+      </classpath>
+      <sysproperty key="java.util.logging.config.file" value="logging.properties"/>
+      <arg value="hymns" />
+    </java>
   </target>
 
 </project>

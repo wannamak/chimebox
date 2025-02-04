@@ -1,11 +1,7 @@
 package chimebox.manual;
 
-import chimebox.logical.ClochesStop;
-import chimebox.logical.HourlyChimeSwitch;
-import chimebox.logical.Notes;
-import chimebox.logical.Power;
-import chimebox.logical.Relays;
-import chimebox.logical.Volume;
+import chimebox.Proto;
+import chimebox.logical.*;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
@@ -40,14 +36,14 @@ public class ManualMidiPlayer {
 
   public ManualMidiPlayer() throws IOException {
     this.database = new MidiFileDatabase();
-    Relays relays = new Relays();
+    Relays relays = new RaspberryRelays(); // new TestingRelays();
     relays.initialize();
     this.power = new Power(relays);
     this.volume = new Volume(relays);
     this.clochesStop = new ClochesStop(power, volume);
     this.notes = new Notes(relays);
     this.hourlyChimeSwitch = new HourlyChimeSwitch();
-    this.fileSelector = new MidiFileSelector(database);
+    this.fileSelector = new MidiFileSelector(database, Proto.Config.getDefaultInstance());
   }
 
   public void run(int fileIndex, int trackIndex, int transposition) throws Exception {

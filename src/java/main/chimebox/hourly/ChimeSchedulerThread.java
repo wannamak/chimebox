@@ -1,5 +1,6 @@
 package chimebox.hourly;
 
+import chimebox.Proto;
 import chimebox.logical.ClochesStop;
 import chimebox.logical.HourlyChimeSwitch;
 import chimebox.logical.Notes;
@@ -27,21 +28,23 @@ public class ChimeSchedulerThread extends Thread {
   private final Power power;
   private final Notes notes;
   private final ClochesStop clochesStop;
+  private final Proto.Config config;
 
   public ChimeSchedulerThread(MidiFileDatabase database, HourlyChimeSwitch hourlyChimeSwitch,
-      Volume volume, Power power, Notes notes, ClochesStop clochesStop) {
+      Volume volume, Power power, Notes notes, ClochesStop clochesStop, Proto.Config config) {
     this.database = database;
     this.hourlyChimeSwitch = hourlyChimeSwitch;
     this.volume = volume;
     this.power = power;
     this.notes = notes;
     this.clochesStop = clochesStop;
+    this.config = config;
   }
 
   @Override
   public void run() {
     PeriodicChimeRunnable runnable = new PeriodicChimeRunnable(database,
-        hourlyChimeSwitch, power, volume, notes, clochesStop);
+        hourlyChimeSwitch, power, volume, notes, clochesStop, config);
     LocalDateTime today = LocalDateTime.now();
     long initialDelayMillis = getMillisUntilNextChime(today);
     ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(

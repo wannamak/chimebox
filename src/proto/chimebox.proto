@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+package chimebox;
+
+option java_package = "chimebox";
+option java_outer_classname = "Proto";
+
+message LocalDate {
+  // ISO-8601 standard, from 1 (January) to 12 (December).
+  optional uint32 month = 1;
+  optional uint32 day_of_month = 2;
+}
+
+message LocalTime {
+  // 24-hour format
+  optional uint32 hour = 1;
+  optional uint32 minute_of_hour = 2;
+}
+
+message SpecialDay {
+  optional LocalDate local_date = 1;
+  optional uint32 midi_file_database_id = 2;
+}
+
+message Config {
+  // Used to select a midi device at startup.  I use "Uno"
+  optional string unique_midi_device_substring = 1;
+
+  // The earliest hour:minute of any day at which the chimes will sound.
+  optional LocalTime daily_start_time = 2;
+
+  // The latest hour:minute of any day at which the chimes will sound.
+  optional LocalTime daily_end_time = 3;
+
+  // Controls the "hour count" chime which follows the tune.
+  optional bool enable_hour_count_chime = 4;
+
+  // Sound a particular chime all day on a special day.
+  repeated SpecialDay special_day = 5;
+}

@@ -1,5 +1,6 @@
 package chimebox.hourly;
 
+import chimebox.Proto;
 import chimebox.logical.ClochesStop;
 import chimebox.logical.HourlyChimeSwitch;
 import chimebox.logical.Notes;
@@ -29,10 +30,6 @@ public class PeriodicChimeRunnable implements Runnable {
   private static final int SILENCE_PRIOR_TO_HOUR_CHIMES_MS = 3000;
   private static final int SILENCE_BETWEEN_HOUR_CHIMES_MS = 1200;
 
-  // TODO: move to config
-  private static final LocalTime START_TIME = LocalTime.of(8, 1);
-  private static final LocalTime END_TIME = LocalTime.of(20, 1);
-
   private final MidiFileDatabase database;
   private final MidiFileSelector midiFileSelector;
   private final HourlyChimeSwitch hourlyChimeSwitch;
@@ -40,23 +37,34 @@ public class PeriodicChimeRunnable implements Runnable {
   private final Power power;
   private final ClochesStop clochesStop;
   private final Notes notes;
+  private final Proto.Config config;
+  private final LocalTime dailyStartTime;
+  private final LocalTime dailyEndTime;
 
 
   public PeriodicChimeRunnable(MidiFileDatabase database, HourlyChimeSwitch hourlyChimeSwitch,
       Power power, Volume volume,
-      Notes notes, ClochesStop clochesStop) {
+      Notes notes, ClochesStop clochesStop,
+      Proto.Config config) {
     this.database = database;
-    this.midiFileSelector = new MidiFileSelector(database);
+    this.midiFileSelector = new MidiFileSelector(database, config);
     this.hourlyChimeSwitch = hourlyChimeSwitch;
     this.power = power;
     this.volume = volume;
     this.clochesStop = clochesStop;
     this.notes = notes;
+    this.config = config;
+    this.dailyStartTime = LocalTime.of(
+        config.getDailyStartTime().getHour(),
+        config.getDailyStartTime().getMinuteOfHour());
+    this.dailyEndTime = LocalTime.of(
+        config.getDailyEndTime().getHour(),
+        config.getDailyEndTime().getMinuteOfHour());
   }
 
   @Override
   public void run() {
-    logger.info("PCR triggered at " + LocalTime.now());
+    logger.finer("PCR triggered at " + LocalTime.now());
     try {
       runInternal();
     } catch (IOException | InvalidMidiDataException e) {
@@ -68,22 +76,22 @@ public class PeriodicChimeRunnable implements Runnable {
     LocalTime time = LocalTime.now();
 
     if (!hourlyChimeSwitch.isClosed()) {
-      logger.info("Not chiming due to hourly chime switch off");
+      logger.finer("Not chiming due to hourly chime switch off");
       return;
     }
 
     if (clochesStop.isDrawn()) {
-      logger.info("Not chiming due to cloches stop being drawn");
+      logger.finer("Not chiming due to cloches stop being drawn");
       return;
     }
 
-    if (time.isAfter(END_TIME)) {
-      logger.info("Not chiming due to after end time");
+    if (time.isAfter(dailyEndTime)) {
+      logger.finer("Not chiming due to after end time");
       return;
     }
 
-    if (time.isBefore(START_TIME)) {
-      logger.info("Not chiming due to before start time");
+    if (time.isBefore(dailyStartTime)) {
+      logger.finer("Not chiming due to before start time");
       return;
     }
 
@@ -109,7 +117,7 @@ public class PeriodicChimeRunnable implements Runnable {
 
     int track = getTrackFromMinuteOfHour(time.getMinute());
     if (track == -1) {
-      logger.info("Not chiming due to unexpected minute of hour");
+      logger.finer("Not chiming due to unexpected minute of hour");
       return;
     }
 
@@ -121,7 +129,7 @@ public class PeriodicChimeRunnable implements Runnable {
 
     tunePlayer.play(track);
 
-    if (false && track == MidiFile.HOUR_TRACK) {
+    if (config.getEnableHourCountChime() && track == MidiFile.HOUR_TRACK) {
       uncheckedThreadSleepMs(SILENCE_PRIOR_TO_HOUR_CHIMES_MS);
 
       int numRepeats = time.getHour();
@@ -166,7 +174,7 @@ public class PeriodicChimeRunnable implements Runnable {
 //      case 45:
 //        return MidiFile.THREE_QUARTERS_TRACK;
       default:
-        logger.warning("Unrecognized minute of hour " + minuteOfHour);
+        logger.finer("Unrecognized minute of hour " + minuteOfHour);
         return -1;
     }
   }

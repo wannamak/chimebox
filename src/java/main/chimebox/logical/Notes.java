@@ -1,7 +1,5 @@
 package chimebox.logical;
 
-import chimebox.Chimebox;
-
 import java.util.logging.Logger;
 
 /**
