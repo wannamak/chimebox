@@ -21,7 +21,7 @@ public class MidiReceiver implements Receiver {
 
   private final ClochesStop cloches;
   private final Notes notes;
-  private final MidiNoteAdaptor adaptor = new MidiNoteAdaptor();
+  private final MidiNoteAdapter adaptor = new MidiNoteAdapter();
   private final MidiMessageLogger messageLogger = new MidiMessageLogger();
 
   public MidiReceiver(ClochesStop cloches, Notes notes) {

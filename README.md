@@ -16,13 +16,21 @@ of changes to play is programmable via ruleset and can be randomized.  Times
 can be included or excluded.
 3) Play doorbell chimes on the loudest setting.
 
+## Music
+
+For v1, I crafted midi files in a music editor.  I used separate
+tracks for the different chime phrases (quarter, half, etc.)
+These files are loaded as a `ChimeTrackMidiFile`.
+
+For v2, chimebox will extract the melody from any Midi file.
+These files are loaded as a `TraditionalMidiFile`.
+
 ## Components
 
 * Raspberry PI 4B
 * Waveshare MCP23017 IO expansion board
 * 3x ELEGO 8 channel relay modules
 * DS3231 Precision RTC Breakout (a reliable clock)
-* <strike>OSA Electronics MIDI Breakout</strike> (Never could get this to work)
 * M-AUDIO Midisport Uno USB Midi interface
 * Standard tubular chime power supply
 
@@ -51,16 +59,3 @@ but it turns on and off the chime power supply as needed.
 dtoverlay=i2c-rtc,ds3231
 ```
 * Install MAudio driver package <code>sudo apt-get install midisport-firmware</code>
-
-## Ecosystem notes
-
-### WiringPI
-
-Grumpy old man?  Unwilling to host source on a standard platform.
-Nice C library, though.
-
-### PI4J
-
-Designed by an engineer.  Engineers love to code... layers upon layers of abstrations and
-abstractions of abstrations, builders to configure the contexts for the abstractions, and to dress it 
-all up an put a bow on it, PI4J uses Maven.  Waste of time.

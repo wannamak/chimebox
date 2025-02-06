@@ -1,6 +1,6 @@
 package chimebox.midi;
 
-public interface PlayerInterface {
+public interface MidiPlayerInterface {
   void sleep(long durationMillis);
 
   void noteOn(int midiNote);

@@ -40,6 +40,17 @@
       <delete dir="bin" />
   </target>
 
+  <target name="test" depends="build">
+    <junit>
+      <formatter type="plain" usefile="false" />
+      <classpath>
+        <path refid="jars" />
+        <pathelement location="${classes-destination}" />
+      </classpath>
+      <test name="chimebox.midi.MidiTrackAdapterTest" />
+    </junit>
+  </target>
+
   <target name="chimebox" depends="build">
       <java classname="chimebox.Chimebox" fork="true">
       <classpath>

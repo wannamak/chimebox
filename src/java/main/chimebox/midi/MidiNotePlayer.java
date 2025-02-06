@@ -5,10 +5,10 @@ import chimebox.logical.Notes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MidiNotePlayer implements PlayerInterface {
+public class MidiNotePlayer implements MidiPlayerInterface {
   private final Logger logger = Logger.getLogger(MidiNotePlayer.class.getName());
 
-  private final MidiNoteAdaptor adaptor = new MidiNoteAdaptor();
+  private final MidiNoteAdapter adaptor = new MidiNoteAdapter();
   private final Notes notes;
   private final int transposition;
 

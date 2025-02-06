@@ -6,13 +6,14 @@ import chimebox.logical.HourlyChimeSwitch;
 import chimebox.logical.Notes;
 import chimebox.logical.Power;
 import chimebox.logical.Volume;
+import chimebox.midi.ChimePhrase;
+import chimebox.midi.ChimeTrackMidiFile;
 import chimebox.midi.LowestMidiNotePlayer;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiNotePlayer;
 import chimebox.midi.MidiPlayer;
-import chimebox.midi.RepeatedNoteAdaptor;
 
 import javax.sound.midi.InvalidMidiDataException;
 import java.io.IOException;
@@ -98,7 +99,7 @@ public class PeriodicChimeRunnable implements Runnable {
     int MINUTE_OF_HOUR_TO_BEGIN_CHIME = 30; // 15
 
     if (currentFile == null || time.getMinute() == MINUTE_OF_HOUR_TO_BEGIN_CHIME) {
-      currentFile = midiFileSelector.select();
+      currentFile = midiFileSelector.selectDatabaseFile();
       if (currentFile == null) {
         logger.info("Not chiming due to no chime files available");
         return;
@@ -106,17 +107,17 @@ public class PeriodicChimeRunnable implements Runnable {
 
       logger.info("Tune: " + currentFile);
       List<Integer> possibleTranspositions = database.getPossibleTranspositions(currentFile.getFile());
-      int transposition = midiFileSelector.getRandomInt(possibleTranspositions.size());
-      transposition = possibleTranspositions.get(0);
+      int transpositionIndex = midiFileSelector.getRandomInt(possibleTranspositions.size());
+      int transposition = possibleTranspositions.get(transpositionIndex);
 
       logger.info("Transposition: " + transposition);
 
-      tunePlayer = new MidiPlayer(currentFile, new RepeatedNoteAdaptor(new MidiNotePlayer(notes, transposition)));
+      tunePlayer = new MidiPlayer(currentFile, new MidiNotePlayer(notes, transposition));
       chimePlayer = new MidiPlayer(currentFile, new LowestMidiNotePlayer(notes, transposition));
     }
 
-    int track = getTrackFromMinuteOfHour(time.getMinute());
-    if (track == -1) {
+    ChimePhrase chimePhrase = getChimePhraseFromMinuteOfHour(time.getMinute());
+    if (chimePhrase == null) {
       logger.finer("Not chiming due to unexpected minute of hour");
       return;
     }
@@ -127,9 +128,9 @@ public class PeriodicChimeRunnable implements Runnable {
     volume.setForte();
     //volume.setPiano();
 
-    tunePlayer.play(track);
+    tunePlayer.play(chimePhrase);
 
-    if (config.getEnableHourCountChime() && track == MidiFile.HOUR_TRACK) {
+    if (config.getEnableHourCountChime() && chimePhrase == ChimePhrase.HOUR) {
       uncheckedThreadSleepMs(SILENCE_PRIOR_TO_HOUR_CHIMES_MS);
 
       int numRepeats = time.getHour();
@@ -147,7 +148,7 @@ public class PeriodicChimeRunnable implements Runnable {
         if (i > 0) {
           uncheckedThreadSleepMs(SILENCE_BETWEEN_HOUR_CHIMES_MS);
         }
-        chimePlayer.play(MidiFile.CHIME_TRACK);
+        chimePlayer.play(ChimePhrase.CHIME);
       }
     }
 
@@ -163,19 +164,19 @@ public class PeriodicChimeRunnable implements Runnable {
     }
   }
 
-  private int getTrackFromMinuteOfHour(int minuteOfHour) {
+  private ChimePhrase getChimePhraseFromMinuteOfHour(int minuteOfHour) {
     switch (minuteOfHour) {
       case 0:
-        return MidiFile.HOUR_TRACK;
+        return ChimePhrase.HOUR;
 //      case 15:
 //        return MidiFile.QUARTER_TRACK;
       case 30:
-        return MidiFile.HALF_TRACK;
+        return ChimePhrase.HALF;
 //      case 45:
 //        return MidiFile.THREE_QUARTERS_TRACK;
       default:
         logger.finer("Unrecognized minute of hour " + minuteOfHour);
-        return -1;
+        return null;
     }
   }
 }

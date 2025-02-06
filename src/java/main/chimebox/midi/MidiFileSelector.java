@@ -1,16 +1,13 @@
 package chimebox.midi;
 
 import chimebox.Proto;
-import com.google.common.collect.ImmutableSet;
 
 import javax.sound.midi.InvalidMidiDataException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Logger;
 import com.google.common.collect.ImmutableList;
 
@@ -51,7 +48,7 @@ public class MidiFileSelector {
     return null;
   }
 
-  public MidiFile select() throws IOException, InvalidMidiDataException {
+  public MidiFile selectDatabaseFile() throws IOException, InvalidMidiDataException {
     LocalDate today = LocalDate.now();
     File chimeFile;
     Proto.SpecialDay specialDay = isSpecialDay(today);
@@ -62,15 +59,15 @@ public class MidiFileSelector {
       chimeFile = database.getFile(ordinaryIndexes.get(index));
     }
     logger.finer("Selected " + chimeFile.getAbsolutePath());
-    return reader.read(chimeFile);
+    return reader.readDatabaseFile(chimeFile);
   }
 
-  public MidiFile select(int fileIndex) throws Exception {
+  public MidiFile selectDatabaseFile(int fileIndex) throws Exception {
     File chimeFile = database.getFile(fileIndex);
     if (!chimeFile.exists()) {
       logger.warning("File not found: " + chimeFile.getAbsolutePath());
       return null;
     }
-    return reader.read(chimeFile);
+    return reader.readDatabaseFile(chimeFile);
   }
 }

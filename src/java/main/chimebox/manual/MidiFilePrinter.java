@@ -4,59 +4,82 @@ import chimebox.Proto;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
-import chimebox.midi.MidiPlayer;
-import chimebox.midi.PlayerInterface;
-import chimebox.midi.RepeatedNoteAdaptor;
+import chimebox.midi.MidiReader;
+
+import javax.sound.midi.MetaMessage;
+import javax.sound.midi.MidiEvent;
+import javax.sound.midi.ShortMessage;
+import javax.sound.midi.SysexMessage;
+import javax.sound.midi.Track;
+import java.io.File;
 
 // ./scripts/run.sh chimebox.manual.MidiFilePrinter 0
-public class MidiFilePrinter implements PlayerInterface {
-  private int trackLengthMs = 0;
-
+public class MidiFilePrinter {
   public static void main(String[] args) throws Exception {
-    new MidiFilePrinter().run(Integer.parseInt(args[0]));
+    new MidiFilePrinter().run(args[0]);
   }
 
-  public void run(int fileIndex) throws Exception {
-    MidiFileDatabase database = new MidiFileDatabase();
-    MidiFileSelector selector = new MidiFileSelector(database, Proto.Config.getDefaultInstance());
-    MidiFile file = selector.select(fileIndex);
-    System.out.println("Tracks: " + file.getTrackSize());
+  public void run(String fileOrIndex) throws Exception {
+    MidiFile midiFile;
+    try {
+      int fileIndex = Integer.parseInt(fileOrIndex);
+      System.out.println("Printing database file index " + fileIndex);
+      MidiFileDatabase database = new MidiFileDatabase();
+      MidiFileSelector selector = new MidiFileSelector(database, Proto.Config.getDefaultInstance());
+      midiFile = selector.selectDatabaseFile(fileIndex);
+    } catch (NumberFormatException nfe) {
+      File file = new File(fileOrIndex);
+      System.out.println("Printing midi file " + file.getAbsolutePath());
+      midiFile = new MidiReader().readMidiFile(file);
+    }
 
-    printTracks(file, this);
-    System.out.println();
-    System.out.println();
-    printTracks(file, new RepeatedNoteAdaptor(this));
+    System.out.println("Tracks: " + midiFile.getTrackSize());
+    printTracks(midiFile);
   }
 
-  private void printTracks(MidiFile file, PlayerInterface playerImpl) {
-    MidiPlayer engine = new MidiPlayer(file, playerImpl);
-    for (int track = 1; track < file.getTrackSize(); track++) {
-      trackLengthMs = 0;
-      System.out.println("TRACK " + track + "----------------------");
-      engine.play(track);
-      System.out.printf("  total len: %dms\n", trackLengthMs);
+  private void printTracks(MidiFile file) {
+    for (int trackIndex = 1; trackIndex < file.getTrackSize(); trackIndex++) {
+      System.out.println("TRACK " + trackIndex + "----------------------");
+      Track track = file.getTrack(trackIndex);
+      printTrack(track);
     }
   }
 
-  @Override
-  public void sleep(long durationMillis) {
-    if (durationMillis > 0) {
-      System.out.printf("[%d] ", durationMillis);
-      trackLengthMs += durationMillis;
+  private void printTrack(Track track) {
+    long lastTick = 0;
+    for (int eventIndex = 0; eventIndex < track.size(); eventIndex++) {
+      MidiEvent event = track.get(eventIndex);
+      if (event.getMessage() instanceof ShortMessage shortMessage) {
+        long tick = event.getTick();
+        int data = shortMessage.getData1();
+        long durationTicks = tick - lastTick;
+        if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+          System.out.printf("%9d ON : %s (%d) (dur:%d)\n",
+              tick, getNoteString(data), data, durationTicks);
+        } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
+          System.out.printf("%9d OFF: %s (%d) (dur:%d)\n",
+              tick, getNoteString(data), data, durationTicks);
+        } else if (shortMessage.getCommand() == ShortMessage.PROGRAM_CHANGE) {
+          System.out.printf("%9d PROGRAM CHANGE: %d\n",
+              tick, data);
+        } else {
+          System.out.printf("Message command: %d\n", shortMessage.getCommand());
+        }
+        if (tick != lastTick) {
+          lastTick = tick;
+        }
+      } else if (event.getMessage() instanceof MetaMessage metaMessage) {
+        System.out.printf("Meta message: %2d len_data:%d\n",
+            metaMessage.getType(), metaMessage.getData().length);
+      } else if (event.getMessage() instanceof SysexMessage sysexMessage) {
+        System.out.printf("Sysex message: len:%d len_data:%d\n",
+            sysexMessage.getMessage().length,
+            sysexMessage.getData().length);
+      }
     }
   }
 
-  @Override
-  public void noteOn(int midiNote) {
-    System.out.print(getNote(midiNote) + " ");
-  }
-
-  @Override
-  public void noteOff(int midiNote) {
-    System.out.print("!" + getNote(midiNote) + " ");
-  }
-
-  private String getNote(int note) {
+  private String getNoteString(int note) {
     int tmp = note - 21;
     int octave = (tmp / 12) + 1;
     tmp = tmp % 12;

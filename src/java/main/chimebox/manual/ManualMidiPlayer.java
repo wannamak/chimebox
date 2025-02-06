@@ -1,13 +1,20 @@
 package chimebox.manual;
 
 import chimebox.Proto;
-import chimebox.logical.*;
+import chimebox.logical.ClochesStop;
+import chimebox.logical.HourlyChimeSwitch;
+import chimebox.logical.Notes;
+import chimebox.logical.Power;
+import chimebox.logical.RaspberryRelays;
+import chimebox.logical.Relays;
+import chimebox.logical.Volume;
+import chimebox.midi.ChimePhrase;
+import chimebox.midi.ChimeTrackMidiFile;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiNotePlayer;
 import chimebox.midi.MidiPlayer;
-import chimebox.midi.RepeatedNoteAdaptor;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,7 +34,7 @@ public class ManualMidiPlayer {
 
   public static void main(String args[]) throws Exception {
     if (args.length != 3) {
-      System.err.println("args file_index track_index transposition");
+      System.err.println("args file_index chime_phrase transposition");
       System.exit(-1);
     }
     System.loadLibrary("chimebox");
@@ -46,17 +53,17 @@ public class ManualMidiPlayer {
     this.fileSelector = new MidiFileSelector(database, Proto.Config.getDefaultInstance());
   }
 
-  public void run(int fileIndex, int trackIndex, int transposition) throws Exception {
-    MidiFile midiFile = fileSelector.select(fileIndex);
+  public void run(int fileIndex, int chimePhraseIndex, int transposition) throws Exception {
+    MidiFile midiFile = fileSelector.selectDatabaseFile(fileIndex);
     List<Integer> possibleTranspositions = database.getPossibleTranspositions(midiFile.getFile());
     logger.info("Possible transpositions: " + possibleTranspositions);
     MidiPlayer tunePlayer = new MidiPlayer(midiFile,
-        new RepeatedNoteAdaptor(new MidiNotePlayer(notes, transposition)));
+        new MidiNotePlayer(notes, transposition));
     logger.info(String.format(
-        "Playing file index %d track %d transposition %d\n", fileIndex, trackIndex, transposition));
+        "Playing file index %d phrase %d transposition %d\n", fileIndex, chimePhraseIndex, transposition));
     power.on();
     volume.setForte();
-    tunePlayer.play(trackIndex);
+    tunePlayer.play(ChimePhrase.values()[chimePhraseIndex]);
     power.off();
     logger.info("Play complete.");
   }

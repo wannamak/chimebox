@@ -1,12 +1,13 @@
 package chimebox.manual;
 
 import chimebox.Proto;
+import chimebox.midi.ChimePhrase;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
-import chimebox.midi.MidiNoteAdaptor;
+import chimebox.midi.MidiNoteAdapter;
 import chimebox.midi.MidiPlayer;
-import chimebox.midi.PlayerInterface;
+import chimebox.midi.MidiPlayerInterface;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 // ./scripts/run.sh chimebox.manual.TranspositionFinder 0
-public class TranspositionFinder implements PlayerInterface {
+public class TranspositionFinder implements MidiPlayerInterface {
   private final Logger logger = Logger.getLogger(TranspositionFinder.class.getName());
 
   public static void main(String[] args) throws Exception {
@@ -24,7 +25,7 @@ public class TranspositionFinder implements PlayerInterface {
 
   private final Set<Integer> BAD_CHIME_NOTES = ImmutableSet.of(1, 2, 9, 21);
   private final Map<Integer, Integer> transpositionToBadNotes = new TreeMap<>();
-  private final MidiNoteAdaptor adaptor = new MidiNoteAdaptor();
+  private final MidiNoteAdapter adaptor = new MidiNoteAdapter();
   private int transpositionBadNotes;
   private int trackBadNotes;
   private int currentTransposition;
@@ -33,7 +34,7 @@ public class TranspositionFinder implements PlayerInterface {
   public void run(int selectorFileIndex) throws Exception {
     MidiFileDatabase database = new MidiFileDatabase();
     MidiFileSelector selector = new MidiFileSelector(database, Proto.Config.getDefaultInstance());
-    MidiFile file = selector.select(selectorFileIndex);
+    MidiFile file = selector.selectDatabaseFile(selectorFileIndex);
 
     MidiPlayer engine = new MidiPlayer(file, this);
 
@@ -56,11 +57,10 @@ public class TranspositionFinder implements PlayerInterface {
   public boolean transpose(MidiPlayer engine) {
     transpositionBadNotes = 0;
     logger.info("Transposition " + currentTransposition);
-    // Don't include chime track as all the notes work on the chime volume level.
-    for (int track = 0; track < 4; track++) {
+    for (ChimePhrase chimePhrase : ChimePhrase.values()) {
       trackBadNotes = 0;
       outOutBoundNote = false;
-      engine.play(track);
+      engine.play(chimePhrase);
       if (outOutBoundNote) {
         return false;
       }

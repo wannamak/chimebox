@@ -1,60 +1,47 @@
 package chimebox.midi;
 
-import javax.sound.midi.MidiEvent;
-import javax.sound.midi.ShortMessage;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class MidiPlayer {
   private final Logger logger = Logger.getLogger(MidiPlayer.class.getName());
 
-  private long lastDeltaTime;
   private final MidiFile file;
-  private final PlayerInterface playerInterface;
+  private final MidiPlayerInterface playerInterface;
 
-  public MidiPlayer(MidiFile file, PlayerInterface playerInterface) {
+  public MidiPlayer(MidiFile file, MidiPlayerInterface playerInterface) {
     this.file = file;
     this.playerInterface = playerInterface;
   }
 
-  public void play(int trackIndex) {
-    lastDeltaTime = 0;
-    logger.info(String.format("Playing file %s track %d.  usecPerQuarter=%d pulsePerQuarter=%d",
-        file.getFile().getName(),
-        trackIndex, file.getUsecPerQuarter(), file.getPulsePerQuarter()));
-    int numEvents = file.getTrack(trackIndex).size();
-    logger.info(String.format("%d events found", numEvents));
-    for (int eventIndex = 0; eventIndex < numEvents; eventIndex++) {
-      boolean isLastEvent = eventIndex == numEvents - 1;
-      processEvent(file.getTrack(trackIndex).get(eventIndex), isLastEvent);
+  public void play(ChimePhrase chimePhrase) {
+    List<MidiFile.MidiNote> notes = file.getMusicalPhrase(chimePhrase);
+    for (int noteIndex = 0; noteIndex < notes.size(); noteIndex++) {
+      boolean isLastNote = noteIndex == notes.size() - 1;
+      processNote(
+          notes.get(noteIndex),
+          isLastNote ? null : notes.get(noteIndex + 1));
     }
-    logger.info(String.format("Playing track %d completed.", trackIndex));
   }
 
-  private void processEvent(MidiEvent event, boolean isLastEvent) {
-    long deltaTime = event.getTick();
-    long period = deltaTime - lastDeltaTime;
-    lastDeltaTime = deltaTime;
+  private void processNote(
+      MidiFile.MidiNote note,
+      MidiFile.MidiNote nextNote) {
+    int durationMs = note.durationMs;
+    boolean isRepeatedNote = false;
 
-    int msPerQuarter = file.getUsecPerQuarter() / 1000;
-    long msForPeriod = period * msPerQuarter / file.getPulsePerQuarter();
-
-    logger.info(String.format("period=%d msPerQtr=%d msForPeriod=%d",
-        period, msPerQuarter, msForPeriod));
-
-    if (!isLastEvent) {
-      logger.info(String.format(" msperq=%d, so sleeping %d ms", msPerQuarter, msForPeriod));
-      playerInterface.sleep(msForPeriod);
+    if (nextNote != null && note != null && nextNote.note == note.note) {
+      // This note will be repeated, so give it half value (and sleep for half after off)
+      durationMs /= 2;
+      isRepeatedNote = true;
     }
 
-    if (event.getMessage() instanceof ShortMessage shortMessage) {
-      if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
-        logger.info("ON  note " + shortMessage.getData1());
-      } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
-        logger.info("OFF note " + shortMessage.getData1());
-      }
-      switch (shortMessage.getCommand()) {
-        case ShortMessage.NOTE_ON -> playerInterface.noteOn(shortMessage.getData1());
-        case ShortMessage.NOTE_OFF -> playerInterface.noteOff(shortMessage.getData1());
+    if (note != null) {
+      playerInterface.noteOn(note.note);
+      playerInterface.sleep(durationMs);
+      playerInterface.noteOff(note.note);
+      if (isRepeatedNote) {
+        playerInterface.sleep(durationMs);
       }
     }
   }
