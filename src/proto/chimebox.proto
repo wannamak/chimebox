@@ -23,7 +23,7 @@ message SpecialDay {
 }
 
 message Config {
-  // Used to select a midi device at startup.  I use "Uno"
+  // Used to select a midi device at startup.  I use "Uno".
   optional string unique_midi_device_substring = 1;
 
   // The earliest hour:minute of any day at which the chimes will sound.
@@ -37,4 +37,7 @@ message Config {
 
   // Sound a particular chime all day on a special day.
   repeated SpecialDay special_day = 5;
+
+  // Directory of Midi files.
+  optional string midi_file_directory = 6;
 }

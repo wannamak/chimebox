@@ -7,10 +7,10 @@ import chimebox.logical.Notes;
 import chimebox.logical.Power;
 import chimebox.logical.Volume;
 import chimebox.midi.ChimePhrase;
-import chimebox.midi.ChimeTrackMidiFile;
 import chimebox.midi.LowestMidiNotePlayer;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
+import chimebox.midi.MidiFileIterator;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiNotePlayer;
 import chimebox.midi.MidiPlayer;
@@ -41,7 +41,7 @@ public class PeriodicChimeRunnable implements Runnable {
   private final Proto.Config config;
   private final LocalTime dailyStartTime;
   private final LocalTime dailyEndTime;
-
+  private MidiFileIterator midiFileIterator;
 
   public PeriodicChimeRunnable(MidiFileDatabase database, HourlyChimeSwitch hourlyChimeSwitch,
       Power power, Volume volume,
@@ -99,7 +99,14 @@ public class PeriodicChimeRunnable implements Runnable {
     int MINUTE_OF_HOUR_TO_BEGIN_CHIME = 30; // 15
 
     if (currentFile == null || time.getMinute() == MINUTE_OF_HOUR_TO_BEGIN_CHIME) {
-      currentFile = midiFileSelector.selectDatabaseFile();
+      if (config.hasMidiFileDirectory()) {
+        if (midiFileIterator == null || !midiFileIterator.hasNext()) {
+          midiFileIterator = new MidiFileIterator(config.getMidiFileDirectory());
+        }
+        currentFile = midiFileIterator.next();
+      } else {
+        currentFile = midiFileSelector.selectDatabaseFile();
+      }
       if (currentFile == null) {
         logger.info("Not chiming due to no chime files available");
         return;

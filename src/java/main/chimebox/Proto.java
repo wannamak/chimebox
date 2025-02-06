@@ -2059,7 +2059,7 @@ public final class Proto {
 
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno"
+     * Used to select a midi device at startup.  I use "Uno".
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2068,7 +2068,7 @@ public final class Proto {
     boolean hasUniqueMidiDeviceSubstring();
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno"
+     * Used to select a midi device at startup.  I use "Uno".
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2077,7 +2077,7 @@ public final class Proto {
     java.lang.String getUniqueMidiDeviceSubstring();
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno"
+     * Used to select a midi device at startup.  I use "Uno".
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2202,6 +2202,35 @@ public final class Proto {
      */
     chimebox.Proto.SpecialDayOrBuilder getSpecialDayOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * Directory of Midi files.
+     * </pre>
+     *
+     * <code>optional string midi_file_directory = 6;</code>
+     * @return Whether the midiFileDirectory field is set.
+     */
+    boolean hasMidiFileDirectory();
+    /**
+     * <pre>
+     * Directory of Midi files.
+     * </pre>
+     *
+     * <code>optional string midi_file_directory = 6;</code>
+     * @return The midiFileDirectory.
+     */
+    java.lang.String getMidiFileDirectory();
+    /**
+     * <pre>
+     * Directory of Midi files.
+     * </pre>
+     *
+     * <code>optional string midi_file_directory = 6;</code>
+     * @return The bytes for midiFileDirectory.
+     */
+    com.google.protobuf.ByteString
+        getMidiFileDirectoryBytes();
   }
   /**
    * Protobuf type {@code chimebox.Config}
@@ -2218,6 +2247,7 @@ public final class Proto {
     private Config() {
       uniqueMidiDeviceSubstring_ = "";
       specialDay_ = java.util.Collections.emptyList();
+      midiFileDirectory_ = "";
     }
 
     @java.lang.Override
@@ -2297,6 +2327,12 @@ public final class Proto {
                   input.readMessage(chimebox.Proto.SpecialDay.PARSER, extensionRegistry));
               break;
             }
+            case 50: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000010;
+              midiFileDirectory_ = bs;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2337,7 +2373,7 @@ public final class Proto {
     private volatile java.lang.Object uniqueMidiDeviceSubstring_;
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno"
+     * Used to select a midi device at startup.  I use "Uno".
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2349,7 +2385,7 @@ public final class Proto {
     }
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno"
+     * Used to select a midi device at startup.  I use "Uno".
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2372,7 +2408,7 @@ public final class Proto {
     }
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno"
+     * Used to select a midi device at startup.  I use "Uno".
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2556,6 +2592,66 @@ public final class Proto {
       return specialDay_.get(index);
     }
 
+    public static final int MIDI_FILE_DIRECTORY_FIELD_NUMBER = 6;
+    private volatile java.lang.Object midiFileDirectory_;
+    /**
+     * <pre>
+     * Directory of Midi files.
+     * </pre>
+     *
+     * <code>optional string midi_file_directory = 6;</code>
+     * @return Whether the midiFileDirectory field is set.
+     */
+    @java.lang.Override
+    public boolean hasMidiFileDirectory() {
+      return ((bitField0_ & 0x00000010) != 0);
+    }
+    /**
+     * <pre>
+     * Directory of Midi files.
+     * </pre>
+     *
+     * <code>optional string midi_file_directory = 6;</code>
+     * @return The midiFileDirectory.
+     */
+    @java.lang.Override
+    public java.lang.String getMidiFileDirectory() {
+      java.lang.Object ref = midiFileDirectory_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          midiFileDirectory_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Directory of Midi files.
+     * </pre>
+     *
+     * <code>optional string midi_file_directory = 6;</code>
+     * @return The bytes for midiFileDirectory.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getMidiFileDirectoryBytes() {
+      java.lang.Object ref = midiFileDirectory_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        midiFileDirectory_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2585,6 +2681,9 @@ public final class Proto {
       for (int i = 0; i < specialDay_.size(); i++) {
         output.writeMessage(5, specialDay_.get(i));
       }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, midiFileDirectory_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2612,6 +2711,9 @@ public final class Proto {
       for (int i = 0; i < specialDay_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, specialDay_.get(i));
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, midiFileDirectory_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2650,6 +2752,11 @@ public final class Proto {
       }
       if (!getSpecialDayList()
           .equals(other.getSpecialDayList())) return false;
+      if (hasMidiFileDirectory() != other.hasMidiFileDirectory()) return false;
+      if (hasMidiFileDirectory()) {
+        if (!getMidiFileDirectory()
+            .equals(other.getMidiFileDirectory())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2681,6 +2788,10 @@ public final class Proto {
       if (getSpecialDayCount() > 0) {
         hash = (37 * hash) + SPECIAL_DAY_FIELD_NUMBER;
         hash = (53 * hash) + getSpecialDayList().hashCode();
+      }
+      if (hasMidiFileDirectory()) {
+        hash = (37 * hash) + MIDI_FILE_DIRECTORY_FIELD_NUMBER;
+        hash = (53 * hash) + getMidiFileDirectory().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -2840,6 +2951,8 @@ public final class Proto {
         } else {
           specialDayBuilder_.clear();
         }
+        midiFileDirectory_ = "";
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -2901,6 +3014,10 @@ public final class Proto {
         } else {
           result.specialDay_ = specialDayBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.midiFileDirectory_ = midiFileDirectory_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2990,6 +3107,11 @@ public final class Proto {
             }
           }
         }
+        if (other.hasMidiFileDirectory()) {
+          bitField0_ |= 0x00000020;
+          midiFileDirectory_ = other.midiFileDirectory_;
+          onChanged();
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -3023,7 +3145,7 @@ public final class Proto {
       private java.lang.Object uniqueMidiDeviceSubstring_ = "";
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno"
+       * Used to select a midi device at startup.  I use "Uno".
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3034,7 +3156,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno"
+       * Used to select a midi device at startup.  I use "Uno".
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3056,7 +3178,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno"
+       * Used to select a midi device at startup.  I use "Uno".
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3077,7 +3199,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno"
+       * Used to select a midi device at startup.  I use "Uno".
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3096,7 +3218,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno"
+       * Used to select a midi device at startup.  I use "Uno".
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3110,7 +3232,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno"
+       * Used to select a midi device at startup.  I use "Uno".
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3806,6 +3928,114 @@ public final class Proto {
         }
         return specialDayBuilder_;
       }
+
+      private java.lang.Object midiFileDirectory_ = "";
+      /**
+       * <pre>
+       * Directory of Midi files.
+       * </pre>
+       *
+       * <code>optional string midi_file_directory = 6;</code>
+       * @return Whether the midiFileDirectory field is set.
+       */
+      public boolean hasMidiFileDirectory() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <pre>
+       * Directory of Midi files.
+       * </pre>
+       *
+       * <code>optional string midi_file_directory = 6;</code>
+       * @return The midiFileDirectory.
+       */
+      public java.lang.String getMidiFileDirectory() {
+        java.lang.Object ref = midiFileDirectory_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            midiFileDirectory_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Directory of Midi files.
+       * </pre>
+       *
+       * <code>optional string midi_file_directory = 6;</code>
+       * @return The bytes for midiFileDirectory.
+       */
+      public com.google.protobuf.ByteString
+          getMidiFileDirectoryBytes() {
+        java.lang.Object ref = midiFileDirectory_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          midiFileDirectory_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Directory of Midi files.
+       * </pre>
+       *
+       * <code>optional string midi_file_directory = 6;</code>
+       * @param value The midiFileDirectory to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMidiFileDirectory(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        midiFileDirectory_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Directory of Midi files.
+       * </pre>
+       *
+       * <code>optional string midi_file_directory = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMidiFileDirectory() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        midiFileDirectory_ = getDefaultInstance().getMidiFileDirectory();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Directory of Midi files.
+       * </pre>
+       *
+       * <code>optional string midi_file_directory = 6;</code>
+       * @param value The bytes for midiFileDirectory to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMidiFileDirectoryBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        midiFileDirectory_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3893,13 +4123,14 @@ public final class Proto {
       "\030\002 \001(\r\"1\n\tLocalTime\022\014\n\004hour\030\001 \001(\r\022\026\n\016min" +
       "ute_of_hour\030\002 \001(\r\"T\n\nSpecialDay\022\'\n\nlocal" +
       "_date\030\001 \001(\0132\023.chimebox.LocalDate\022\035\n\025midi" +
-      "_file_database_id\030\002 \001(\r\"\326\001\n\006Config\022$\n\034un" +
+      "_file_database_id\030\002 \001(\r\"\363\001\n\006Config\022$\n\034un" +
       "ique_midi_device_substring\030\001 \001(\t\022-\n\020dail" +
       "y_start_time\030\002 \001(\0132\023.chimebox.LocalTime\022" +
       "+\n\016daily_end_time\030\003 \001(\0132\023.chimebox.Local" +
       "Time\022\037\n\027enable_hour_count_chime\030\004 \001(\010\022)\n" +
       "\013special_day\030\005 \003(\0132\024.chimebox.SpecialDay" +
-      "B\021\n\010chimeboxB\005Proto"
+      "\022\033\n\023midi_file_directory\030\006 \001(\tB\021\n\010chimebo" +
+      "xB\005Proto"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3928,7 +4159,7 @@ public final class Proto {
     internal_static_chimebox_Config_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_chimebox_Config_descriptor,
-        new java.lang.String[] { "UniqueMidiDeviceSubstring", "DailyStartTime", "DailyEndTime", "EnableHourCountChime", "SpecialDay", });
+        new java.lang.String[] { "UniqueMidiDeviceSubstring", "DailyStartTime", "DailyEndTime", "EnableHourCountChime", "SpecialDay", "MidiFileDirectory", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
