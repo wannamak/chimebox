@@ -48,6 +48,10 @@ public class MidiFileSelector {
     return null;
   }
 
+  public boolean isSpecialDay() {
+    return isSpecialDay(LocalDate.now()) != null;
+  }
+
   public MidiFile selectDatabaseFile() throws IOException, InvalidMidiDataException {
     LocalDate today = LocalDate.now();
     File chimeFile;

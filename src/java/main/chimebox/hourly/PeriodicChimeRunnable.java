@@ -32,7 +32,7 @@ public class PeriodicChimeRunnable implements Runnable {
   private static final int SILENCE_BETWEEN_HOUR_CHIMES_MS = 1200;
 
   private final MidiFileDatabase database;
-  private final MidiFileSelector midiFileSelector;
+  private final MidiFileSelector  midiFileSelector;
   private final HourlyChimeSwitch hourlyChimeSwitch;
   private final Volume volume;
   private final Power power;
@@ -99,7 +99,7 @@ public class PeriodicChimeRunnable implements Runnable {
     int MINUTE_OF_HOUR_TO_BEGIN_CHIME = 30; // 15
 
     if (currentFile == null || time.getMinute() == MINUTE_OF_HOUR_TO_BEGIN_CHIME) {
-      if (config.hasMidiFileDirectory()) {
+      if (!midiFileSelector.isSpecialDay() && config.hasMidiFileDirectory()) {
         if (midiFileIterator == null || !midiFileIterator.hasNext()) {
           midiFileIterator = new MidiFileIterator(config.getMidiFileDirectory());
         }
