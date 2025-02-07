@@ -99,13 +99,18 @@ public class PeriodicChimeRunnable implements Runnable {
     int MINUTE_OF_HOUR_TO_BEGIN_CHIME = 30; // 15
 
     if (currentFile == null || time.getMinute() == MINUTE_OF_HOUR_TO_BEGIN_CHIME) {
+      int transposition;
       if (!midiFileSelector.isSpecialDay() && config.hasMidiFileDirectory()) {
         if (midiFileIterator == null || !midiFileIterator.hasNext()) {
           midiFileIterator = new MidiFileIterator(config.getMidiFileDirectory());
         }
         currentFile = midiFileIterator.next();
+        transposition = 0;
       } else {
         currentFile = midiFileSelector.selectDatabaseFile();
+        List<Integer> possibleTranspositions = database.getPossibleTranspositions(currentFile.getFile());
+        int transpositionIndex = midiFileSelector.getRandomInt(possibleTranspositions.size());
+        transposition = possibleTranspositions.get(transpositionIndex);
       }
       if (currentFile == null) {
         logger.info("Not chiming due to no chime files available");
@@ -113,10 +118,6 @@ public class PeriodicChimeRunnable implements Runnable {
       }
 
       logger.info("Tune: " + currentFile);
-      List<Integer> possibleTranspositions = database.getPossibleTranspositions(currentFile.getFile());
-      int transpositionIndex = midiFileSelector.getRandomInt(possibleTranspositions.size());
-      int transposition = possibleTranspositions.get(transpositionIndex);
-
       logger.info("Transposition: " + transposition);
 
       tunePlayer = new MidiPlayer(currentFile, new MidiNotePlayer(notes, transposition));
