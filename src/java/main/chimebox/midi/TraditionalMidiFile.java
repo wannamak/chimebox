@@ -61,9 +61,7 @@ public class TraditionalMidiFile implements MidiFile {
     // We just want the first and final phrase.
     phrases.put(ChimePhrase.HALF, notes.subList(0,
         indexOfDurationGreaterEqual(notes, currentDurationThreshold) + 1));
-    phrases.put(ChimePhrase.HOUR, notes.subList(
-        reverseIndexOfDurationGreaterEqual(notes, currentDurationThreshold) + 1,
-        notes.size()));
+    phrases.put(ChimePhrase.HOUR, notes);
   }
 
   private int indexOfDurationGreaterEqual(List<MidiNote> notes, int duration) {
