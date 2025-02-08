@@ -2059,7 +2059,7 @@ public final class Proto {
 
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno".
+     * Used to select a midi device at startup.  Use "Uno" for MidiSport.
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2068,7 +2068,7 @@ public final class Proto {
     boolean hasUniqueMidiDeviceSubstring();
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno".
+     * Used to select a midi device at startup.  Use "Uno" for MidiSport.
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2077,7 +2077,7 @@ public final class Proto {
     java.lang.String getUniqueMidiDeviceSubstring();
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno".
+     * Used to select a midi device at startup.  Use "Uno" for MidiSport.
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2231,6 +2231,35 @@ public final class Proto {
      */
     com.google.protobuf.ByteString
         getMidiFileDirectoryBytes();
+
+    /**
+     * <pre>
+     * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+     * </pre>
+     *
+     * <code>optional string gpio_label = 7;</code>
+     * @return Whether the gpioLabel field is set.
+     */
+    boolean hasGpioLabel();
+    /**
+     * <pre>
+     * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+     * </pre>
+     *
+     * <code>optional string gpio_label = 7;</code>
+     * @return The gpioLabel.
+     */
+    java.lang.String getGpioLabel();
+    /**
+     * <pre>
+     * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+     * </pre>
+     *
+     * <code>optional string gpio_label = 7;</code>
+     * @return The bytes for gpioLabel.
+     */
+    com.google.protobuf.ByteString
+        getGpioLabelBytes();
   }
   /**
    * Protobuf type {@code chimebox.Config}
@@ -2248,6 +2277,7 @@ public final class Proto {
       uniqueMidiDeviceSubstring_ = "";
       specialDay_ = java.util.Collections.emptyList();
       midiFileDirectory_ = "";
+      gpioLabel_ = "";
     }
 
     @java.lang.Override
@@ -2333,6 +2363,12 @@ public final class Proto {
               midiFileDirectory_ = bs;
               break;
             }
+            case 58: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000020;
+              gpioLabel_ = bs;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2373,7 +2409,7 @@ public final class Proto {
     private volatile java.lang.Object uniqueMidiDeviceSubstring_;
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno".
+     * Used to select a midi device at startup.  Use "Uno" for MidiSport.
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2385,7 +2421,7 @@ public final class Proto {
     }
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno".
+     * Used to select a midi device at startup.  Use "Uno" for MidiSport.
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2408,7 +2444,7 @@ public final class Proto {
     }
     /**
      * <pre>
-     * Used to select a midi device at startup.  I use "Uno".
+     * Used to select a midi device at startup.  Use "Uno" for MidiSport.
      * </pre>
      *
      * <code>optional string unique_midi_device_substring = 1;</code>
@@ -2652,6 +2688,66 @@ public final class Proto {
       }
     }
 
+    public static final int GPIO_LABEL_FIELD_NUMBER = 7;
+    private volatile java.lang.Object gpioLabel_;
+    /**
+     * <pre>
+     * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+     * </pre>
+     *
+     * <code>optional string gpio_label = 7;</code>
+     * @return Whether the gpioLabel field is set.
+     */
+    @java.lang.Override
+    public boolean hasGpioLabel() {
+      return ((bitField0_ & 0x00000020) != 0);
+    }
+    /**
+     * <pre>
+     * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+     * </pre>
+     *
+     * <code>optional string gpio_label = 7;</code>
+     * @return The gpioLabel.
+     */
+    @java.lang.Override
+    public java.lang.String getGpioLabel() {
+      java.lang.Object ref = gpioLabel_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          gpioLabel_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+     * </pre>
+     *
+     * <code>optional string gpio_label = 7;</code>
+     * @return The bytes for gpioLabel.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGpioLabelBytes() {
+      java.lang.Object ref = gpioLabel_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gpioLabel_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2684,6 +2780,9 @@ public final class Proto {
       if (((bitField0_ & 0x00000010) != 0)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 6, midiFileDirectory_);
       }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, gpioLabel_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2714,6 +2813,9 @@ public final class Proto {
       }
       if (((bitField0_ & 0x00000010) != 0)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, midiFileDirectory_);
+      }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, gpioLabel_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2757,6 +2859,11 @@ public final class Proto {
         if (!getMidiFileDirectory()
             .equals(other.getMidiFileDirectory())) return false;
       }
+      if (hasGpioLabel() != other.hasGpioLabel()) return false;
+      if (hasGpioLabel()) {
+        if (!getGpioLabel()
+            .equals(other.getGpioLabel())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2792,6 +2899,10 @@ public final class Proto {
       if (hasMidiFileDirectory()) {
         hash = (37 * hash) + MIDI_FILE_DIRECTORY_FIELD_NUMBER;
         hash = (53 * hash) + getMidiFileDirectory().hashCode();
+      }
+      if (hasGpioLabel()) {
+        hash = (37 * hash) + GPIO_LABEL_FIELD_NUMBER;
+        hash = (53 * hash) + getGpioLabel().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -2953,6 +3064,8 @@ public final class Proto {
         }
         midiFileDirectory_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
+        gpioLabel_ = "";
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -3018,6 +3131,10 @@ public final class Proto {
           to_bitField0_ |= 0x00000010;
         }
         result.midiFileDirectory_ = midiFileDirectory_;
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.gpioLabel_ = gpioLabel_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3112,6 +3229,11 @@ public final class Proto {
           midiFileDirectory_ = other.midiFileDirectory_;
           onChanged();
         }
+        if (other.hasGpioLabel()) {
+          bitField0_ |= 0x00000040;
+          gpioLabel_ = other.gpioLabel_;
+          onChanged();
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -3145,7 +3267,7 @@ public final class Proto {
       private java.lang.Object uniqueMidiDeviceSubstring_ = "";
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno".
+       * Used to select a midi device at startup.  Use "Uno" for MidiSport.
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3156,7 +3278,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno".
+       * Used to select a midi device at startup.  Use "Uno" for MidiSport.
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3178,7 +3300,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno".
+       * Used to select a midi device at startup.  Use "Uno" for MidiSport.
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3199,7 +3321,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno".
+       * Used to select a midi device at startup.  Use "Uno" for MidiSport.
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3218,7 +3340,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno".
+       * Used to select a midi device at startup.  Use "Uno" for MidiSport.
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -3232,7 +3354,7 @@ public final class Proto {
       }
       /**
        * <pre>
-       * Used to select a midi device at startup.  I use "Uno".
+       * Used to select a midi device at startup.  Use "Uno" for MidiSport.
        * </pre>
        *
        * <code>optional string unique_midi_device_substring = 1;</code>
@@ -4036,6 +4158,114 @@ public final class Proto {
         onChanged();
         return this;
       }
+
+      private java.lang.Object gpioLabel_ = "";
+      /**
+       * <pre>
+       * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+       * </pre>
+       *
+       * <code>optional string gpio_label = 7;</code>
+       * @return Whether the gpioLabel field is set.
+       */
+      public boolean hasGpioLabel() {
+        return ((bitField0_ & 0x00000040) != 0);
+      }
+      /**
+       * <pre>
+       * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+       * </pre>
+       *
+       * <code>optional string gpio_label = 7;</code>
+       * @return The gpioLabel.
+       */
+      public java.lang.String getGpioLabel() {
+        java.lang.Object ref = gpioLabel_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            gpioLabel_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+       * </pre>
+       *
+       * <code>optional string gpio_label = 7;</code>
+       * @return The bytes for gpioLabel.
+       */
+      public com.google.protobuf.ByteString
+          getGpioLabelBytes() {
+        java.lang.Object ref = gpioLabel_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gpioLabel_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+       * </pre>
+       *
+       * <code>optional string gpio_label = 7;</code>
+       * @param value The gpioLabel to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGpioLabel(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        gpioLabel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+       * </pre>
+       *
+       * <code>optional string gpio_label = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGpioLabel() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        gpioLabel_ = getDefaultInstance().getGpioLabel();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Device label for GPIO controller.  Use "pinctrl-bcm2711" for Raspberry PI.
+       * </pre>
+       *
+       * <code>optional string gpio_label = 7;</code>
+       * @param value The bytes for gpioLabel to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGpioLabelBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        gpioLabel_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -4123,14 +4353,14 @@ public final class Proto {
       "\030\002 \001(\r\"1\n\tLocalTime\022\014\n\004hour\030\001 \001(\r\022\026\n\016min" +
       "ute_of_hour\030\002 \001(\r\"T\n\nSpecialDay\022\'\n\nlocal" +
       "_date\030\001 \001(\0132\023.chimebox.LocalDate\022\035\n\025midi" +
-      "_file_database_id\030\002 \001(\r\"\363\001\n\006Config\022$\n\034un" +
+      "_file_database_id\030\002 \001(\r\"\207\002\n\006Config\022$\n\034un" +
       "ique_midi_device_substring\030\001 \001(\t\022-\n\020dail" +
       "y_start_time\030\002 \001(\0132\023.chimebox.LocalTime\022" +
       "+\n\016daily_end_time\030\003 \001(\0132\023.chimebox.Local" +
       "Time\022\037\n\027enable_hour_count_chime\030\004 \001(\010\022)\n" +
       "\013special_day\030\005 \003(\0132\024.chimebox.SpecialDay" +
-      "\022\033\n\023midi_file_directory\030\006 \001(\tB\021\n\010chimebo" +
-      "xB\005Proto"
+      "\022\033\n\023midi_file_directory\030\006 \001(\t\022\022\n\ngpio_la" +
+      "bel\030\007 \001(\tB\021\n\010chimeboxB\005Proto"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4159,7 +4389,7 @@ public final class Proto {
     internal_static_chimebox_Config_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_chimebox_Config_descriptor,
-        new java.lang.String[] { "UniqueMidiDeviceSubstring", "DailyStartTime", "DailyEndTime", "EnableHourCountChime", "SpecialDay", "MidiFileDirectory", });
+        new java.lang.String[] { "UniqueMidiDeviceSubstring", "DailyStartTime", "DailyEndTime", "EnableHourCountChime", "SpecialDay", "MidiFileDirectory", "GpioLabel", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
