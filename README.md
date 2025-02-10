@@ -68,10 +68,18 @@ interface in favor of the new `/dev/gpiochipN` interface.
 * As is frequently true in the software world, there are two ways
 to do anything: the deprecated way, and the way which doesn't work yet.
 * This has never more been true than the new `/dev/gpiochipN` interface.
-V1 of libgpiod's API was so bad, that it has already
+V1 of libgpiod's API was so bad that it has already
 been totally rewritten as V2.  However, the major distributions
 don't bundle V2 yet, only V1, which we aren't supposed to use,
 and the easy `/sys/class/gpio` has been removed.
+* The primary sharp edge with either new API is that the state
+reverts when the device closes.  The API user has no control of
+this behavior.  In addition the API became convoluted to solve
+a problem which does not exist (concern about the amount written
+to `/sys/class/gpio`).  Engineers love to write code, and this
+is obvious from the bloated libgpiod API evolution.  This love
+must always be checked by the need to address real-world problems
+in an efficient and pragmatic way.
 * I am forced to manually bundle libgpiod2 and code hundreds of
 lines and days of troubleshooting to simply control 8 GPIO pins.
 (I would have reverted the Pi back to Ubuntu 20 LTS except the
