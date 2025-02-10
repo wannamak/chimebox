@@ -4,8 +4,13 @@ import chimebox.logical.HourlyChimeSwitch;
 import chimebox.logical.RaspberryRelays;
 import chimebox.logical.Relay;
 import chimebox.logical.Relays;
+import chimebox.physical.GPIOChipInfoProvider;
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
+import java.nio.file.Path;
+
+import static chimebox.physical.GPIOChipInfoProvider.DEFAULT_RASPBERRY_PI_DEVICE_LABEL;
 
 public class ManualTester {
 
@@ -15,26 +20,30 @@ public class ManualTester {
 
   public void run() throws IOException {
     System.loadLibrary("chimebox");
-    Relays relays = new RaspberryRelays();
-    HourlyChimeSwitch hourlyChimeSwitch = new HourlyChimeSwitch();
+    GPIOChipInfoProvider gpioManager = new GPIOChipInfoProvider();
+    Path gpioDevicePath = gpioManager.getDevicePathForLabel(DEFAULT_RASPBERRY_PI_DEVICE_LABEL);
+    Preconditions.checkNotNull(
+        gpioDevicePath, "No device for label " + DEFAULT_RASPBERRY_PI_DEVICE_LABEL);
+    Relays relays = new RaspberryRelays(gpioDevicePath);
+    HourlyChimeSwitch hourlyChimeSwitch = new HourlyChimeSwitch(gpioDevicePath);
     relays.initialize();
     hourlyChimeSwitch.initialize();
     while (true) {
       try {
-        System.out.printf("Relay 0 - %d or -1 for switch, or sxx for strike: ", relays.length() - 1);
+        System.out.printf("0-%d to toggle relays; s0-s%d for 1/2 second strike; " +
+            "h to read on/off switch\n",
+            relays.length() - 1, relays.length() - 1);
         String line = System.console().readLine().trim();
+        if (line.equals("h")) {
+          System.out.printf("Switch status = %s\n", hourlyChimeSwitch.isClosed() ? "on" : "off");
+          continue;
+        }
         boolean strike = false;
         if (line.startsWith("s")) {
           strike = true;
           line = line.substring(1);
         }
         int index = Integer.parseInt(line);
-        System.out.printf("Read [%s]=[%d]\n", line, index);
-        if (index == -1) {
-          System.out.printf("Switch status = %s\n", hourlyChimeSwitch.isClosed() ? "on" : "off");
-          continue;
-        }
-
         Relay targetRelay = relays.getRelays()[index];
 
         if (strike) {

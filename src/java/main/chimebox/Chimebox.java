@@ -10,7 +10,8 @@ import chimebox.logical.Relays;
 import chimebox.logical.Volume;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiReceiver;
-import chimebox.Proto;
+import chimebox.physical.GPIOChipInfoProvider;
+import com.google.common.base.Preconditions;
 import com.google.protobuf.TextFormat;
 
 import javax.sound.midi.MidiDevice;
@@ -20,6 +21,7 @@ import javax.sound.midi.Transmitter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
 public class Chimebox {
@@ -58,13 +60,19 @@ public class Chimebox {
     }
     this.config = configBuilder.build();
     this.inputDeviceNameSubstring = config.getUniqueMidiDeviceSubstring();
-    Relays relays = new RaspberryRelays();
+
+    GPIOChipInfoProvider gpioManager = new GPIOChipInfoProvider();
+    Path gpioDevicePath = gpioManager.getDevicePathForLabel(config.getGpioLabel());
+    Preconditions.checkNotNull(
+        gpioDevicePath, "No device for label " + config.getGpioLabel());
+
+    Relays relays = new RaspberryRelays(gpioDevicePath);
     relays.initialize();
     this.power = new Power(relays);
     this.volume = new Volume(relays);
     this.clochesStop = new ClochesStop(power, volume);
     this.notes = new Notes(relays);
-    this.hourlyChimeSwitch = new HourlyChimeSwitch();
+    this.hourlyChimeSwitch = new HourlyChimeSwitch(gpioDevicePath);
     hourlyChimeSwitch.initialize();
     this.database = new MidiFileDatabase();
   }

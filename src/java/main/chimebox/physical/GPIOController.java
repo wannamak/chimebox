@@ -2,108 +2,89 @@ package chimebox.physical;
 
 import com.google.common.base.Preconditions;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controls GPIO via /dev/gpiochipN, which is the 'new' (and only) way to control GPIO
+ * in Ubuntu 24 (kernel 6.8.0-1018).  See LegacyGPIOController for older kernels.
+ */
 public class GPIOController {
   private static final Logger logger = Logger.getLogger(GPIOController.class.getName());
 
-  private static final String PREFIX = "/sys/class/gpio";
-  private static final Path EXPORT_DIR = new File(PREFIX, "export").toPath();
-  private final Path DIRECTION_FILE;
-  private final Path VALUE_FILE;
+  public enum Value {
+    ACTIVE,
+    INACTIVE
+  }
 
   public enum Direction {
     IN,
     OUT
   }
 
-  public enum Value {
-    HIGH,
-    LOW
-  }
-
+  private final Path devicePath;
   private final int logicalPin;
   private final Direction direction;
+  private long context;
 
-  public GPIOController(int logicalPin, Direction direction) {
+  public GPIOController(Path devicePath, int logicalPin, Direction direction) {
+    this.devicePath = devicePath;
     this.logicalPin = logicalPin;
     this.direction = direction;
-    File gpioDir = new File(PREFIX, String.format("gpio%d", logicalPin));
-    this.DIRECTION_FILE = new File(gpioDir, "direction").toPath();
-    this.VALUE_FILE = new File(gpioDir, "value").toPath();
   }
 
-  public synchronized void initialize() throws IOException {
-    if (!Files.exists(DIRECTION_FILE)) {
-      logger.fine("Writing pin to " + EXPORT_DIR);
-      if (!repeatedlyAttemptWrite(EXPORT_DIR, Integer.toString(logicalPin))) {
-        logger.severe("Unable to export pin");
-      }
+  public synchronized void initialize() {
+    if (direction == Direction.OUT) {
+      context = initializeOutput(devicePath.toString(), logicalPin, true);
+    } else {
+      Preconditions.checkState(direction == Direction.IN);
+      context = initializeInput(devicePath.toString(), logicalPin);
     }
-    logger.fine("Writing direction to " + DIRECTION_FILE);
-    // https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
-    // says we can write high for out
-    String directionFileContent = direction == Direction.OUT ? "high" : "in";
-    if (!repeatedlyAttemptWrite(DIRECTION_FILE, directionFileContent)) {
-      logger.severe("Unable to write direction file for logical pin " + logicalPin);
-    }
+    Preconditions.checkState(context != 0);
   }
 
-  private boolean repeatedlyAttemptWrite(Path path, String content) throws IOException {
-    int retryCount = 0;
-    while (retryCount < 20) {
-      try {
-        Files.writeString(path, content);
-        return true;
-      } catch (AccessDeniedException ade) {
-        retryCount++;
-        try {
-          Thread.sleep(50);
-        } catch (InterruptedException ie) {
-          logger.log(Level.WARNING, "", ie);
-        }
-      }
-    }
-    return false;
-  }
+  /**
+   * Returns an opaque context for the GPIO pin.
+   */
+  private native long initializeOutput(String devicePath, int pin, boolean isActiveLow);
+  private native long initializeInput(String devicePath, int pin);
 
-  public synchronized void set(Value value) throws IOException {
+  public synchronized void set(Value value) {
     Preconditions.checkState(direction == Direction.OUT);
-    logger.finest("Setting pin by writing " + VALUE_FILE);
-    Files.writeString(VALUE_FILE, value.equals(Value.LOW) ? "0" : "1");
+    int result = setInternal(context, value.equals(Value.ACTIVE));
+    Preconditions.checkState(result == 0);
   }
 
-  public synchronized Value get() throws IOException {
-    logger.finest("Getting pin by reading " + VALUE_FILE);
-    String currentValue = Files.readString(VALUE_FILE);
-    return currentValue.trim().equals("0") ? Value.LOW : Value.HIGH;
+  /**
+   * Returns -1 on error, else 0.
+   */
+  private native int setInternal(long context, boolean value);
+
+  public synchronized Value get() {
+    boolean result = getInternal(context);
+    return result ? Value.ACTIVE : Value.INACTIVE;
   }
+
+  private native boolean getInternal(long context);
 
   @Override
   public String toString() {
-    return String.format("GPIO pin %d direction %s", logicalPin,
-        direction == Direction.OUT ? "out" : "in");
+    return String.format("GPIO pin %d:%s %s", logicalPin, direction.toString(), devicePath);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(logicalPin, direction);
+    return Objects.hash(logicalPin, direction, devicePath);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof GPIOController)) {
+    if (!(o instanceof GPIOController that)) {
       return false;
     }
-    GPIOController that = (GPIOController) o;
-    return Objects.equals(this.direction, that.direction)
-        && Objects.equals(this.logicalPin, that.logicalPin);
+    return Objects.equals(this.logicalPin, that.logicalPin)
+        && Objects.equals(this.direction, that.direction)
+        && Objects.equals(this.devicePath, that.devicePath);
   }
 }

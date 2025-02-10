@@ -1,10 +1,8 @@
 package chimebox.logical;
 
-import chimebox.Chimebox;
 import chimebox.physical.GPIOController;
 
-import java.io.IOException;
-import java.util.logging.Level;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
 public class HourlyChimeSwitch extends GPIOController {
@@ -12,21 +10,16 @@ public class HourlyChimeSwitch extends GPIOController {
 
   private static final int HOURLY_CHIME_SWITCH_LOGICAL_PIN = 19;
 
-  public HourlyChimeSwitch() {
-    super(HOURLY_CHIME_SWITCH_LOGICAL_PIN, Direction.IN);
+  public HourlyChimeSwitch(Path gpioDevicePath) {
+    super(gpioDevicePath, HOURLY_CHIME_SWITCH_LOGICAL_PIN, Direction.IN);
   }
 
-  public boolean isClosed() throws IOException {
-    return get() == Value.HIGH;
+  public boolean isClosed() {
+    return get() == Value.ACTIVE;
   }
 
   @Override
   public String toString() {
-    try {
-      return "Hourly chime switch is " + (isClosed() ? "on" : "off");
-    } catch (IOException e) {
-      logger.log(Level.WARNING, "", e);
-      return super.toString();
-    }
+    return "Hourly chime switch is " + (isClosed() ? "on" : "off");
   }
 }

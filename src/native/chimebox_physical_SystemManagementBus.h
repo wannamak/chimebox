@@ -18,7 +18,7 @@ JNIEXPORT jint JNICALL Java_chimebox_physical_SystemManagementBus_readByte
 /*
  * Class:     chimebox_physical_SystemManagementBus
  * Method:    writeByte
- * Signature: (III)V
+ * Signature: (III)I
  */
 JNIEXPORT jint JNICALL Java_chimebox_physical_SystemManagementBus_writeByte
   (JNIEnv *, jobject, jint, jint, jint);

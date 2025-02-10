@@ -15,10 +15,15 @@ import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiNotePlayer;
 import chimebox.midi.MidiPlayer;
+import chimebox.physical.GPIOChipInfoProvider;
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
+
+import static chimebox.physical.GPIOChipInfoProvider.DEFAULT_RASPBERRY_PI_DEVICE_LABEL;
 
 // ./scripts/run.sh chimebox.manual.ManualMidiPlayer 0 0 0
 public class ManualMidiPlayer {
@@ -43,13 +48,17 @@ public class ManualMidiPlayer {
 
   public ManualMidiPlayer() throws IOException {
     this.database = new MidiFileDatabase();
-    Relays relays = new RaspberryRelays(); // new TestingRelays();
+    GPIOChipInfoProvider gpioManager = new GPIOChipInfoProvider();
+    Path gpioDevicePath = gpioManager.getDevicePathForLabel(DEFAULT_RASPBERRY_PI_DEVICE_LABEL);
+    Preconditions.checkNotNull(
+        gpioDevicePath, "No device for label " + DEFAULT_RASPBERRY_PI_DEVICE_LABEL);
+    Relays relays = new RaspberryRelays(gpioDevicePath); // new TestingRelays();
     relays.initialize();
     this.power = new Power(relays);
     this.volume = new Volume(relays);
     this.clochesStop = new ClochesStop(power, volume);
     this.notes = new Notes(relays);
-    this.hourlyChimeSwitch = new HourlyChimeSwitch();
+    this.hourlyChimeSwitch = new HourlyChimeSwitch(gpioDevicePath);
     this.fileSelector = new MidiFileSelector(database, Proto.Config.getDefaultInstance());
   }
 
