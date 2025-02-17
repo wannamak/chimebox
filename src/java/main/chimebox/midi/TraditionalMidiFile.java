@@ -28,7 +28,7 @@ public class TraditionalMidiFile implements MidiFile {
     splitNotesToPhrases(notes);
   }
 
-  private static final int MINIMUM_NUMBER_OF_SPLITS = 4;
+  private static final int MINIMUM_NUMBER_OF_SPLITS = 2;
 
   private void splitNotesToPhrases(List<MidiNote> notes) {
     // Builds a map of all durations to frequency.

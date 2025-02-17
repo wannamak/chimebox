@@ -1,6 +1,7 @@
 package chimebox.midi;
 
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.ShortMessage;
@@ -8,12 +9,9 @@ import javax.sound.midi.Track;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class MidiTrackAdapter {
   private final int ticksPerBeat;
@@ -25,13 +23,13 @@ public class MidiTrackAdapter {
   }
 
   static class CoalescedMidiEvent {
-    Map<Integer, Integer> noteToCommand;
+    ListMultimap<Integer, Integer> noteToCommand;
     CoalescedMidiEvent() {
-      this.noteToCommand = new HashMap<>();
+      this.noteToCommand = ArrayListMultimap.create();
     }
 
     Optional<Integer> getHighestSoundingNoteOn() {
-      return noteToCommand.entrySet().stream()
+      return noteToCommand.entries().stream()
           .filter(entry -> entry.getValue() == ShortMessage.NOTE_ON)
           .map(Map.Entry::getKey)
           .max(Integer::compareTo);
@@ -56,7 +54,7 @@ public class MidiTrackAdapter {
       // Ask me how I know.
       if (soundingNote != -1
           && event.noteToCommand.containsKey(soundingNote)
-          && event.noteToCommand.get(soundingNote) == ShortMessage.NOTE_OFF) {
+          && event.noteToCommand.get(soundingNote).contains(ShortMessage.NOTE_OFF)) {
         long tickThisNote = tick - startTick;
         long durationMs = tickThisNote * msPerQuarter / ticksPerBeat;
         result.add(new MidiFile.MidiNote(soundingNote, (int) durationMs));

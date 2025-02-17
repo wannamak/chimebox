@@ -41,7 +41,7 @@
   </target>
 
   <target name="test" depends="build">
-    <junit>
+    <junit fork="true">
       <formatter type="plain" usefile="false" />
       <classpath>
         <path refid="jars" />
