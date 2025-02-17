@@ -1,10 +1,12 @@
 package chimebox.manual;
 
 import chimebox.Proto;
+import chimebox.midi.ChimePhrase;
 import chimebox.midi.MidiFile;
 import chimebox.midi.MidiFileDatabase;
 import chimebox.midi.MidiFileSelector;
 import chimebox.midi.MidiReader;
+import chimebox.midi.MidiTrackAdapter;
 
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiEvent;
@@ -35,6 +37,9 @@ public class MidiFilePrinter {
 
     System.out.println("Tracks: " + midiFile.getTrackSize());
     printTracks(midiFile);
+
+    System.out.println("HOUR Phrase: ");
+    System.out.println(midiFile.getMusicalPhrase(ChimePhrase.HOUR));
   }
 
   private void printTracks(MidiFile file) {
